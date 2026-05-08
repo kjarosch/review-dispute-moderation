@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What Review Dispute Moderation Is</title>
+
+<!--
+  Course 1 / Card 3 — Review Dispute Moderation Foundations
+  Source: Review Dispute Moderation KA v005 (Vanessa Ukaigwe, 21/4/2026)
+  Sections used: "What", "Why", "Scope and Limitations", "Guiding Principles", "When"
+
+  Layout: Stacked. Categories (In Scope vs Out of Scope) at top, full-width examples grid below.
+  Reading flow: header → categories → examples → synthesis (Remember) → Queue Targets.
+-->
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+
+  :root {
+    --tt-blue: #009FD9;
+    --tt-black: #2F3033;
+    --tt-black-300: #676D73;
+    --tt-gray: #D3D4D5;
+    --tt-gray-300: #E9ECED;
+    --tt-gray-200: #FAFAFA;
+    --tt-white: #FFFFFF;
+    --tt-green: #2DB783;
+    --tt-indigo: #5968E2;
+    --tt-green-tint: #E8F7F1;
+    --tt-blue-tint: #E5F5FB;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    font-family: 'Thumbtack Rise', 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--tt-black);
+    background: var(--tt-white);
+    line-height: 1.5;
+    font-size: 15px;
+  }
+
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    background: var(--tt-white);
+  }
+
+  /* Header */
+  .header {
+    background: var(--tt-black);
+    color: var(--tt-white);
+    padding: 28px 40px 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .header-icon {
+    width: 56px;
+    height: 56px;
+    background: var(--tt-blue);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .header-icon svg {
+    width: 32px;
+    height: 32px;
+    stroke: var(--tt-white);
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .header-text h1 {
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.15;
+    margin-bottom: 8px;
+  }
+
+  .header-text .subtitle {
+    color: var(--tt-blue);
+    font-size: 16px;
+    font-weight: 600;
+    border-bottom: 2px solid var(--tt-blue);
+    display: inline-block;
+    padding-bottom: 4px;
+  }
+
+  /* Main content area - now stacked */
+  .main {
+    padding: 32px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  /* Intro line */
+  .intro {
+    font-size: 16px;
+    color: var(--tt-black);
+    line-height: 1.5;
+    max-width: 900px;
+  }
+
+  /* Section titles - shared style for top and bottom sections */
+  .section-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--tt-black);
+    margin-bottom: 6px;
+  }
+
+  .section-subtitle {
+    font-size: 14px;
+    color: var(--tt-black-300);
+    font-weight: 500;
+    margin-bottom: 18px;
+  }
+
+  /* TOP SECTION — Categories side-by-side */
+  .categories-section {
+    width: 100%;
+  }
+
+  .scope-compare {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+
+  .scope-tile {
+    background: var(--tt-white);
+    border: 1.5px solid var(--tt-gray-300);
+    border-radius: 14px;
+    padding: 22px;
+  }
+
+  .scope-tile.in-scope {
+    background: var(--tt-green-tint);
+    border-color: var(--tt-green);
+  }
+
+  .scope-tile.out-of-scope {
+    background: var(--tt-gray-200);
+    border-color: var(--tt-gray);
+  }
+
+  .scope-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+
+  .scope-badge {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .scope-badge.green { background: var(--tt-green); }
+  .scope-badge.gray { background: var(--tt-black-300); }
+
+  .scope-badge svg {
+    width: 16px;
+    height: 16px;
+    stroke: var(--tt-white);
+    fill: none;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .scope-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--tt-black);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .scope-subtitle {
+    font-size: 14px;
+    color: var(--tt-black-300);
+    margin-bottom: 16px;
+  }
+
+  .scope-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .scope-item {
+    background: var(--tt-white);
+    border: 1.5px solid transparent;
+    border-radius: 10px;
+    padding: 14px 16px;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    font-family: inherit;
+    transition: all 0.2s ease;
+    display: block;
+  }
+
+  .scope-tile.in-scope .scope-item {
+    border-color: rgba(45, 183, 131, 0.25);
+  }
+
+  .scope-tile.out-of-scope .scope-item {
+    border-color: rgba(103, 109, 115, 0.20);
+  }
+
+  .scope-tile.in-scope .scope-item:hover:not(.revealed) {
+    border-color: var(--tt-green);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(45, 183, 131, 0.15);
+  }
+
+  .scope-tile.out-of-scope .scope-item:hover:not(.revealed) {
+    border-color: var(--tt-black-300);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(103, 109, 115, 0.12);
+  }
+
+  .scope-item:focus {
+    outline: 2px solid var(--tt-blue);
+    outline-offset: 2px;
+  }
+
+  .scope-item.revealed {
+    cursor: default;
+    transform: none;
+  }
+
+  .scope-tile.in-scope .scope-item.revealed {
+    border-color: var(--tt-green);
+    border-width: 1.5px;
+  }
+
+  .scope-tile.out-of-scope .scope-item.revealed {
+    border-color: var(--tt-black-300);
+    border-width: 1.5px;
+  }
+
+  .scope-item-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .scope-item-header .item-icon {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    color: var(--tt-black);
+  }
+
+  .scope-item-header .item-icon svg {
+    width: 100%;
+    height: 100%;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .scope-item-title {
+    font-size: 15px;
+    color: var(--tt-black);
+    font-weight: 600;
+    flex: 1;
+    line-height: 1.3;
+  }
+
+  .reveal-hint {
+    font-size: 11px;
+    color: var(--tt-black-300);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 700;
+    background: var(--tt-gray-200);
+    padding: 4px 10px;
+    border-radius: 4px;
+    border: 1px solid var(--tt-gray-300);
+    flex-shrink: 0;
+  }
+
+  .scope-item.revealed .reveal-hint {
+    display: none;
+  }
+
+  .scope-item-reveal {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease, margin-top 0.35s ease, padding-top 0.35s ease;
+  }
+
+  .scope-item.revealed .scope-item-reveal {
+    max-height: 400px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--tt-gray-300);
+  }
+
+  .reveal-quote {
+    display: block;
+    font-size: 15px;
+    color: var(--tt-black);
+    font-weight: 700;
+    line-height: 1.45;
+    margin-bottom: 10px;
+  }
+
+  .reveal-explanation {
+    display: block;
+    font-size: 14px;
+    color: var(--tt-black);
+    line-height: 1.55;
+    font-weight: 400;
+  }
+
+  .vs-badge {
+    background: var(--tt-blue);
+    color: var(--tt-white);
+    font-weight: 700;
+    font-size: 13px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 60px;
+  }
+
+  /* Section divider */
+  .section-divider {
+    height: 1px;
+    background: var(--tt-gray-300);
+    margin: 8px 0;
+  }
+
+  /* BOTTOM SECTION — Examples grid */
+  .examples-section {
+    width: 100%;
+  }
+
+  .examples-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  .example-tile {
+    background: var(--tt-white);
+    border: 1.5px solid var(--tt-gray-300);
+    border-radius: 12px;
+    padding: 18px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-height: 170px;
+    text-align: left;
+    font-family: inherit;
+    width: 100%;
+  }
+
+  .example-tile:hover:not(.revealed) {
+    border-color: var(--tt-blue);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 159, 217, 0.12);
+  }
+
+  .example-tile:focus {
+    outline: 2px solid var(--tt-blue);
+    outline-offset: 2px;
+  }
+
+  .example-tile.revealed {
+    cursor: default;
+    transform: none;
+  }
+
+  .tile-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .tile-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--tt-gray-300);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--tt-black-300);
+  }
+
+  .tile-icon svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .tile-stars {
+    display: flex;
+    gap: 2px;
+  }
+
+  .star {
+    color: var(--tt-gray);
+    font-size: 15px;
+  }
+
+  .star.filled { color: #FEBE14; }
+
+  .tile-text {
+    font-size: 15px;
+    color: var(--tt-black);
+    font-weight: 600;
+    line-height: 1.45;
+    flex: 1;
+  }
+
+  .tile-verdict {
+    background: var(--tt-gray-300);
+    color: var(--tt-black-300);
+    padding: 9px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+
+  .tile-verdict.in-scope {
+    background: var(--tt-green-tint);
+    color: var(--tt-green);
+    border: 1.5px solid var(--tt-green);
+  }
+
+  .tile-verdict.out-of-scope {
+    background: var(--tt-gray-300);
+    color: var(--tt-black);
+    border: 1.5px solid var(--tt-black-300);
+  }
+
+  .tile-verdict-default {
+    background: var(--tt-blue-tint);
+    color: var(--tt-blue);
+    border: 1.5px solid var(--tt-blue);
+  }
+
+  .tile-reveal {
+    font-size: 14px;
+    color: var(--tt-black);
+    line-height: 1.55;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease, margin-top 0.35s ease, padding-top 0.35s ease;
+  }
+
+  .tile-reveal.show {
+    max-height: 250px;
+    margin-top: 6px;
+    padding-top: 12px;
+    border-top: 1px solid var(--tt-gray-300);
+  }
+
+  /* Remember callout - now full width as closing synthesis */
+  .remember-callout {
+    background: var(--tt-blue-tint);
+    border-left: 4px solid var(--tt-blue);
+    border-radius: 8px;
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 8px;
+  }
+
+  .remember-icon {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    color: var(--tt-blue);
+  }
+
+  .remember-callout p {
+    font-size: 16px;
+    color: var(--tt-black);
+    font-weight: 500;
+  }
+
+  .remember-callout strong { font-weight: 700; }
+
+  /* Queue Targets */
+  .queue-targets {
+    background: var(--tt-gray-200);
+    padding: 20px 40px;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    border-top: 1px solid var(--tt-gray-300);
+  }
+
+  .qt-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--tt-black);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-right: 1.5px solid var(--tt-gray);
+    padding-right: 24px;
+  }
+
+  .qt-metric {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .qt-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .qt-icon.sla {
+    background: var(--tt-green-tint);
+    color: var(--tt-green);
+  }
+
+  .qt-icon.ht {
+    background: #ECEDFB;
+    color: var(--tt-indigo);
+  }
+
+  .qt-icon svg {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .qt-text .qt-title {
+    font-size: 12px;
+    color: var(--tt-black-300);
+    font-weight: 600;
+  }
+
+  .qt-text .qt-value {
+    font-size: 15px;
+    color: var(--tt-black);
+    font-weight: 700;
+  }
+
+  /* Responsive */
+  @media (max-width: 1100px) {
+    .header { padding: 24px 24px 20px; }
+    .main { padding: 24px; gap: 24px; }
+    .examples-grid { grid-template-columns: repeat(2, 1fr); }
+    .queue-targets {
+      padding: 20px 24px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .qt-label {
+      border-right: none;
+      padding-right: 0;
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .scope-compare { grid-template-columns: 1fr; }
+    .vs-badge { margin-top: 0; justify-self: center; }
+    .examples-grid { grid-template-columns: 1fr; }
+    .header-text h1 { font-size: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M12 3v18"/><path d="M5 21h14"/><path d="M5 7h14"/><path d="M5 7l-3 7c0 2 1.5 3 3 3s3-1 3-3l-3-7z"/><path d="M19 7l-3 7c0 2 1.5 3 3 3s3-1 3-3l-3-7z"/></svg>
+    </div>
+    <div class="header-text">
+      <h1>What Review Dispute Moderation Is</h1>
+      <span class="subtitle">We evaluate policy violations — not who was right.</span>
+    </div>
+  </header>
+
+  <div class="main">
+
+    <!-- Intro -->
+    <p class="intro">Review dispute moderation is how we evaluate concerns about customer reviews left for pros.</p>
+
+    <!-- TOP SECTION: Categories side-by-side -->
+    <section class="categories-section">
+      <h2 class="section-title">The two types of concerns</h2>
+      <p class="section-subtitle">Click any item to see a real example of what it looks like.</p>
+
+      <div class="scope-compare">
+
+        <!-- IN SCOPE -->
+        <div class="scope-tile in-scope">
+          <div class="scope-header">
+            <div class="scope-badge green" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><polyline points="5 12 10 17 19 8"/></svg>
+            </div>
+            <span class="scope-title" style="color: var(--tt-green);">In Scope</span>
+          </div>
+          <p class="scope-subtitle">These concerns belong in this queue.</p>
+          <ul class="scope-list">
+
+            <li>
+              <button class="scope-item" aria-label="Click to see an example of no verified interaction">
+                <div class="scope-item-header">
+                  <span class="item-icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="9" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><circle cx="17" cy="9" r="3"/><path d="M14 20c0-2 2-4 4-4s4 2 4 4"/></svg></span>
+                  <span class="scope-item-title">No verified interaction</span>
+                  <span class="reveal-hint">Tap</span>
+                </div>
+                <div class="scope-item-reveal">
+                  <span class="reveal-quote">"He never showed up. I didn't even hire him."</span>
+                  <span class="reveal-explanation">A review with no real customer-pro interaction belongs in this queue.</span>
+                </div>
+              </button>
+            </li>
+
+            <li>
+              <button class="scope-item" aria-label="Click to see an example of privacy or PII">
+                <div class="scope-item-header">
+                  <span class="item-icon"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg></span>
+                  <span class="scope-item-title">Privacy or PII in the review</span>
+                  <span class="reveal-hint">Tap</span>
+                </div>
+                <div class="scope-item-reveal">
+                  <span class="reveal-quote">"Call or text me at 555-123-4567."</span>
+                  <span class="reveal-explanation">Personal info — phone numbers, addresses, emails, social handles — is a content violation.</span>
+                </div>
+              </button>
+            </li>
+
+            <li>
+              <button class="scope-item" aria-label="Click to see an example of commercial promotion">
+                <div class="scope-item-header">
+                  <span class="item-icon"><svg viewBox="0 0 24 24"><path d="M3 11l18-7v16l-18-7"/><path d="M9 13v6"/></svg></span>
+                  <span class="scope-item-title">Commercial promotion</span>
+                  <span class="reveal-hint">Tap</span>
+                </div>
+                <div class="scope-item-reveal">
+                  <span class="reveal-quote">"Check out my business at mysite.com!"</span>
+                  <span class="reveal-explanation">Reviews that promote another business or service are a content violation.</span>
+                </div>
+              </button>
+            </li>
+
+            <li>
+              <button class="scope-item" aria-label="Click to see an example of fake or incentivized reviews">
+                <div class="scope-item-header">
+                  <span class="item-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="4"/><path d="M8 9h8"/><path d="M6 21l2-8"/><path d="M18 21l-2-8"/></svg></span>
+                  <span class="scope-item-title">Fake or incentivized reviews</span>
+                  <span class="reveal-hint">Tap</span>
+                </div>
+                <div class="scope-item-reveal">
+                  <span class="reveal-quote">Reviews the pro suspects are incentivized, duplicated, fake, or fraudulent.</span>
+                  <span class="reveal-explanation">These belong in this queue for investigation.</span>
+                </div>
+              </button>
+            </li>
+
+            <li>
+              <button class="scope-item" aria-label="Click to see an example of harassment or discrimination">
+                <div class="scope-item-header">
+                  <span class="item-icon"><svg viewBox="0 0 24 24"><path d="M12 3l9 5v6c0 5-4 8-9 8s-9-3-9-8V8l9-5z"/><line x1="9" y1="11" x2="15" y2="11"/></svg></span>
+                  <span class="scope-item-title">Harassment or discrimination</span>
+                  <span class="reveal-hint">Tap</span>
+                </div>
+                <div class="scope-item-reveal">
+                  <span class="reveal-quote">Profanity, threats, slurs, or discriminatory language directed at the pro.</span>
+                  <span class="reveal-explanation">These violate the Content and Review Policy and Non-Discrimination Policy.</span>
+                </div>
+              </button>
+            </li>
+
+          </ul>
+        </div>
+
+        <div class="vs-badge" aria-hidden="true">VS.</div>
+
+        <!-- OUT OF SCOPE -->
+        <div class="scope-tile out-of-scope">
+          <div class="scope-header">
+            <div class="scope-badge gray" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"/><line x1="6" y1="18" x2="18" y2="6"/></svg>
+            </div>
+            <span class="scope-title">Out of Scope</span>
+          </div>
+          <p class="scope-subtitle">These concerns are not policy violations.</p>
+          <ul class="scope-list">
+
+            <li>
+              <button class="scope-item" aria-label="Click to see an example of customer exaggeration">
+                <div class="scope-item-header">
+                  <span class="item-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></span>
+                  <span class="scope-item-title">The customer exaggerated</span>
+                  <span class="reveal-hint">Tap</span>
+                </div>
+                <div class="scope-item-reveal">
+                  <span class="reveal-quote">"This job took way longer than he said it would."</span>
+                  <span class="reveal-explanation">The pro and customer disagree about the facts. We don't arbitrate what happened.</span>
+                </div>
+              </button>
+            </li>
+
+            <li>
+              <button class="scope-item" aria-label="Click to see an example of bad experience">
+                <div class="scope-item-header">
+                  <span class="item-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M16 16s-1.5-2-4-2-4 2-4 2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></span>
+                  <span class="scope-item-title">The pro and customer had a bad experience</span>
+                  <span class="reveal-hint">Tap</span>
+                </div>
+                <div class="scope-item-reveal">
+                  <span class="reveal-quote">"The whole project was stressful and we didn't get along."</span>
+                  <span class="reveal-explanation">A bad experience isn't a policy violation. The pro can respond publicly.</span>
+                </div>
+              </button>
+            </li>
+
+            <li>
+              <button class="scope-item" aria-label="Click to see an example of personality conflict">
+                <div class="scope-item-header">
+                  <span class="item-icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="9" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><circle cx="17" cy="9" r="3"/><path d="M14 20c0-2 2-4 4-4s4 2 4 4"/></svg></span>
+                  <span class="scope-item-title">Personality conflicts</span>
+                  <span class="reveal-hint">Tap</span>
+                </div>
+                <div class="scope-item-reveal">
+                  <span class="reveal-quote">"He was rude and so unprofessional."</span>
+                  <span class="reveal-explanation">The customer's read of the pro's tone isn't something we judge — only policy violations are.</span>
+                </div>
+              </button>
+            </li>
+
+            <li>
+              <button class="scope-item" aria-label="Click to see an example of deciding who is truthful">
+                <div class="scope-item-header">
+                  <span class="item-icon"><svg viewBox="0 0 24 24"><path d="M12 3v18"/><path d="M5 8h14l-2 8H7z"/><path d="M3 8l2-3h14l2 3"/></svg></span>
+                  <span class="scope-item-title">Deciding who is truthful</span>
+                  <span class="reveal-hint">Tap</span>
+                </div>
+                <div class="scope-item-reveal">
+                  <span class="reveal-quote">"The pro is lying about what happened."</span>
+                  <span class="reveal-explanation">Thumbtack is neutral. If both parties interacted, we don't decide whose version is right.</span>
+                </div>
+              </button>
+            </li>
+
+            <li>
+              <button class="scope-item" aria-label="Click to see an example of financial disagreement">
+                <div class="scope-item-header">
+                  <span class="item-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v12"/><path d="M9 9h4.5a2 2 0 010 4H9"/><path d="M9 13h5.5a2 2 0 010 4H9"/></svg></span>
+                  <span class="scope-item-title">Financial disagreements</span>
+                  <span class="reveal-hint">Tap</span>
+                </div>
+                <div class="scope-item-reveal">
+                  <span class="reveal-quote">"I got my money back, so this review isn't fair."</span>
+                  <span class="reveal-explanation">A refunded lead doesn't disqualify a review. We judge the interaction, not the financials.</span>
+                </div>
+              </button>
+            </li>
+
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- BOTTOM SECTION: Examples grid -->
+    <section class="examples-section">
+      <h2 class="section-title">Now test yourself</h2>
+      <p class="section-subtitle">Read each review. Predict whether it's in scope or out of scope. Click to check.</p>
+
+      <div class="examples-grid">
+
+        <button class="example-tile" data-verdict="in-scope" aria-label="Click to reveal verdict for review about phone number">
+          <div class="tile-top">
+            <div class="tile-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg></div>
+            <div class="tile-stars" aria-label="1 of 5 stars"><span class="star filled">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
+          </div>
+          <p class="tile-text">"Call or text me at 555-123-4567."</p>
+          <div class="tile-verdict tile-verdict-default">Click to reveal</div>
+          <div class="tile-reveal">PII (phone number) is a content violation. PII in review text is grounds for removal.</div>
+        </button>
+
+        <button class="example-tile" data-verdict="out-of-scope" aria-label="Click to reveal verdict for review about being rude">
+          <div class="tile-top">
+            <div class="tile-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M16 16s-1.5-2-4-2-4 2-4 2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></div>
+            <div class="tile-stars" aria-label="2 of 5 stars"><span class="star filled">★</span><span class="star filled">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
+          </div>
+          <p class="tile-text">"He was rude and so unprofessional."</p>
+          <div class="tile-verdict tile-verdict-default">Click to reveal</div>
+          <div class="tile-reveal">This is the customer's experience of the interaction. We don't decide whether the pro was actually rude — we decide whether the review violates policy.</div>
+        </button>
+
+        <button class="example-tile" data-verdict="in-scope" aria-label="Click to reveal verdict for review with business URL">
+          <div class="tile-top">
+            <div class="tile-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
+            <div class="tile-stars" aria-label="1 of 5 stars"><span class="star filled">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
+          </div>
+          <p class="tile-text">"Check out my business at mysite.com!"</p>
+          <div class="tile-verdict tile-verdict-default">Click to reveal</div>
+          <div class="tile-reveal">Commercial promotion is a content violation. A review that promotes another business is grounds for removal.</div>
+        </button>
+
+        <button class="example-tile" data-verdict="out-of-scope" aria-label="Click to reveal verdict for review about job timing">
+          <div class="tile-top">
+            <div class="tile-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div>
+            <div class="tile-stars" aria-label="2 of 5 stars"><span class="star filled">★</span><span class="star filled">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
+          </div>
+          <p class="tile-text">"This job took way longer than he said it would."</p>
+          <div class="tile-verdict tile-verdict-default">Click to reveal</div>
+          <div class="tile-reveal">The customer and pro disagree about the timing. We don't arbitrate what happened during the project.</div>
+        </button>
+
+        <button class="example-tile" data-verdict="in-scope" aria-label="Click to reveal verdict for review with no interaction">
+          <div class="tile-top">
+            <div class="tile-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/><line x1="3" y1="3" x2="21" y2="21"/></svg></div>
+            <div class="tile-stars" aria-label="1 of 5 stars"><span class="star filled">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
+          </div>
+          <p class="tile-text">"He never showed up. I didn't even hire him."</p>
+          <div class="tile-verdict tile-verdict-default">Click to reveal</div>
+          <div class="tile-reveal">A review with no verified interaction is exactly what this queue handles.</div>
+        </button>
+
+        <button class="example-tile" data-verdict="out-of-scope" aria-label="Click to reveal verdict for review about refund">
+          <div class="tile-top">
+            <div class="tile-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
+            <div class="tile-stars" aria-label="2 of 5 stars"><span class="star filled">★</span><span class="star filled">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
+          </div>
+          <p class="tile-text">"I got my money back, so this review isn't fair."</p>
+          <div class="tile-verdict tile-verdict-default">Click to reveal</div>
+          <div class="tile-reveal">A refunded lead doesn't automatically disqualify a review. We judge the interaction, not the financial outcome.</div>
+        </button>
+
+      </div>
+    </section>
+
+    <!-- Closing synthesis -->
+    <div class="remember-callout">
+      <svg class="remember-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 00-4 12.7c.6.5 1 1.2 1 2v.3h6v-.3c0-.8.4-1.5 1-2A7 7 0 0012 2z"/>
+      </svg>
+      <p><strong>Remember:</strong> We evaluate policy violations — not who was right.</p>
+    </div>
+
+  </div>
+
+  <!-- Queue Targets -->
+  <div class="queue-targets">
+    <span class="qt-label">Queue Targets</span>
+    <div class="qt-metric">
+      <div class="qt-icon sla" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
+      <div class="qt-text">
+        <div class="qt-title">SLA</div>
+        <div class="qt-value">72 hours</div>
+      </div>
+    </div>
+    <div class="qt-metric">
+      <div class="qt-icon ht" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M9 1h6"/><path d="M12 9v4"/><path d="M19 4l1.5 1.5"/></svg>
+      </div>
+      <div class="qt-text">
+        <div class="qt-title">Handling Time Target</div>
+        <div class="qt-value">15 minutes per case</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  document.querySelectorAll('.example-tile').forEach(tile => {
+    tile.addEventListener('click', () => {
+      if (tile.classList.contains('revealed')) return;
+      tile.classList.add('revealed');
+      const verdict = tile.dataset.verdict;
+      const verdictBadge = tile.querySelector('.tile-verdict');
+      const reveal = tile.querySelector('.tile-reveal');
+      verdictBadge.classList.remove('tile-verdict-default');
+      verdictBadge.classList.add(verdict);
+      verdictBadge.textContent = verdict === 'in-scope' ? 'In Scope ✓' : 'Out of Scope ✕';
+      reveal.classList.add('show');
+    });
+  });
+
+  document.querySelectorAll('.scope-item').forEach(item => {
+    item.addEventListener('click', () => {
+      if (item.classList.contains('revealed')) return;
+      item.classList.add('revealed');
+    });
+  });
+</script>
+
+</body>
+</html>
