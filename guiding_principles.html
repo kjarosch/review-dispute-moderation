@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Four Guiding Principles</title>
+
+<!--
+  Course 1 / Card 5 — The Four Guiding Principles
+  Source: Review Dispute Moderation KA v005 (Vanessa Ukaigwe, 21/4/2026)
+  Section: "Guiding Principles"
+
+  Principle language on each card front is verbatim from the KA.
+  Misread language is derived from the KA by inversion.
+  Marcus introduction at bottom sets up Card 6 (Activity 2).
+-->
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+
+  :root {
+    --tt-blue: #009FD9;
+    --tt-black: #2F3033;
+    --tt-black-300: #676D73;
+    --tt-gray: #D3D4D5;
+    --tt-gray-300: #E9ECED;
+    --tt-gray-200: #FAFAFA;
+    --tt-white: #FFFFFF;
+    --tt-green: #2DB783;
+    --tt-indigo: #5968E2;
+    --tt-green-tint: #E8F7F1;
+    --tt-blue-tint: #E5F5FB;
+    --tt-red-tint: #FFF0F0;
+    --tt-red: #FF5A5F;
+    --tt-yellow: #FEBE14;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    font-family: 'Thumbtack Rise', 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--tt-black);
+    background: var(--tt-white);
+    line-height: 1.5;
+    font-size: 15px;
+  }
+
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    background: var(--tt-white);
+  }
+
+  /* Header */
+  .header {
+    background: var(--tt-black);
+    color: var(--tt-white);
+    padding: 28px 40px 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .header-icon {
+    width: 56px;
+    height: 56px;
+    background: var(--tt-blue);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .header-icon svg {
+    width: 32px;
+    height: 32px;
+    stroke: var(--tt-white);
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .header-text h1 {
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.15;
+    margin-bottom: 8px;
+  }
+
+  .header-text .subtitle {
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.75);
+    line-height: 1.5;
+    max-width: 700px;
+  }
+
+  .header-text .interaction-hint {
+    font-size: 14px;
+    color: var(--tt-blue);
+    font-weight: 600;
+    margin-top: 8px;
+  }
+
+  /* Main */
+  .main {
+    padding: 32px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  /* Principle cards — 2x2 grid */
+  .principles-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .principle-card {
+    background: var(--tt-white);
+    border: 2px solid var(--tt-gray-300);
+    border-radius: 14px;
+    overflow: hidden;
+    transition: border-color 0.2s ease;
+  }
+
+  .principle-card:hover:not(.revealed) {
+    border-color: var(--tt-blue);
+  }
+
+  .principle-front {
+    padding: 24px;
+  }
+
+  .principle-number {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--tt-black-300);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  .principle-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--tt-black);
+    margin-bottom: 12px;
+    line-height: 1.25;
+  }
+
+  .principle-definition {
+    font-size: 15px;
+    color: var(--tt-black);
+    line-height: 1.55;
+    margin-bottom: 18px;
+  }
+
+  .reveal-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--tt-blue-tint);
+    color: var(--tt-blue);
+    border: 1.5px solid var(--tt-blue);
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .reveal-btn:hover {
+    background: var(--tt-blue);
+    color: var(--tt-white);
+  }
+
+  .reveal-btn:focus {
+    outline: 2px solid var(--tt-blue);
+    outline-offset: 2px;
+  }
+
+  .reveal-btn svg {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform 0.3s ease;
+  }
+
+  .principle-card.revealed .reveal-btn svg {
+    transform: rotate(180deg);
+  }
+
+  .principle-card.revealed .reveal-btn {
+    background: var(--tt-gray-200);
+    color: var(--tt-black-300);
+    border-color: var(--tt-gray);
+  }
+
+  /* Misread reveal */
+  .principle-misread {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+    background: var(--tt-red-tint);
+    border-top: 2px solid transparent;
+  }
+
+  .principle-card.revealed .principle-misread {
+    max-height: 400px;
+    border-top-color: var(--tt-red);
+  }
+
+  .misread-inner {
+    padding: 24px;
+  }
+
+  .misread-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--tt-red);
+    margin-bottom: 14px;
+  }
+
+  .misread-label svg {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .misread-quote {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--tt-black);
+    line-height: 1.45;
+    margin-bottom: 14px;
+  }
+
+  .misread-correction {
+    font-size: 15px;
+    color: var(--tt-black);
+    line-height: 1.55;
+    font-weight: 400;
+  }
+
+  /* Divider */
+  .section-divider {
+    height: 1px;
+    background: var(--tt-gray-300);
+    margin: 12px 0;
+  }
+
+  /* Marcus section */
+  .marcus-section {
+    background: var(--tt-gray-200);
+    border: 2px solid var(--tt-gray-300);
+    border-radius: 14px;
+    padding: 28px;
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+  }
+
+  .marcus-icon {
+    width: 56px;
+    height: 56px;
+    background: var(--tt-blue);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .marcus-icon svg {
+    width: 28px;
+    height: 28px;
+    stroke: var(--tt-white);
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .marcus-content { flex: 1; }
+
+  .marcus-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--tt-blue);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+
+  .marcus-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--tt-black);
+    margin-bottom: 14px;
+  }
+
+  .marcus-text {
+    font-size: 15px;
+    color: var(--tt-black);
+    line-height: 1.6;
+    margin-bottom: 14px;
+  }
+
+  .marcus-review {
+    background: var(--tt-white);
+    border: 1.5px solid var(--tt-gray);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+  }
+
+  .marcus-review-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .marcus-reviewer {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--tt-black);
+  }
+
+  .marcus-review-stars {
+    display: flex;
+    gap: 2px;
+  }
+
+  .marcus-review-stars .star { font-size: 14px; }
+
+  .marcus-review-text {
+    font-size: 15px;
+    color: var(--tt-black);
+    line-height: 1.5;
+    font-weight: 500;
+  }
+
+  .marcus-dispute {
+    font-size: 15px;
+    color: var(--tt-black);
+    line-height: 1.6;
+  }
+
+  .marcus-transition {
+    font-size: 15px;
+    color: var(--tt-blue);
+    font-weight: 600;
+    margin-top: 16px;
+  }
+
+  @media (max-width: 900px) {
+    .principles-grid { grid-template-columns: 1fr; }
+    .header { padding: 24px 24px 20px; }
+    .main { padding: 24px; }
+    .marcus-section { flex-direction: column; gap: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <header class="header">
+    <div class="header-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+    </div>
+    <div class="header-text">
+      <h1>The Four Guiding Principles</h1>
+      <p class="subtitle">These four principles govern every call in this queue. You'll use them for the rest of this program and in every live case after May 22.</p>
+      <p class="interaction-hint">Click "Show common misread" on each card to see where specialists get tripped up.</p>
+    </div>
+  </header>
+
+  <div class="main">
+
+    <div class="principles-grid">
+
+      <!-- Principle 1: Neutrality -->
+      <div class="principle-card" id="principle-1">
+        <div class="principle-front">
+          <div class="principle-number">Principle 1</div>
+          <h2 class="principle-name">Neutrality</h2>
+          <p class="principle-definition">Thumbtack is neutral. If the customer and pro interacted, we do not arbitrate what happened or didn't happen, or the truthfulness of the review.</p>
+          <button class="reveal-btn" aria-label="Show common misread for Neutrality" onclick="toggleMisread('principle-1')">
+            Show common misread
+            <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+        </div>
+        <div class="principle-misread">
+          <div class="misread-inner">
+            <div class="misread-label">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              Common misread
+            </div>
+            <p class="misread-quote">"The pro's story is detailed and convincing, so the review must be wrong."</p>
+            <p class="misread-correction">It's tempting. But a detailed story is not a policy violation. We need a violation, not a stronger narrative.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Principle 2: No edits -->
+      <div class="principle-card" id="principle-2">
+        <div class="principle-front">
+          <div class="principle-number">Principle 2</div>
+          <h2 class="principle-name">No edits</h2>
+          <p class="principle-definition">We either remove the review or leave it. We do not edit reviews.</p>
+          <button class="reveal-btn" aria-label="Show common misread for No edits" onclick="toggleMisread('principle-2')">
+            Show common misread
+            <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+        </div>
+        <div class="principle-misread">
+          <div class="misread-inner">
+            <div class="misread-label">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              Common misread
+            </div>
+            <p class="misread-quote">"Just take out the bad part and leave the rest."</p>
+            <p class="misread-correction">There's no middle path. The review stays as written or it comes down. We don't edit.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Principle 3: Clear violation only -->
+      <div class="principle-card" id="principle-3">
+        <div class="principle-front">
+          <div class="principle-number">Principle 3</div>
+          <h2 class="principle-name">Clear violation only</h2>
+          <p class="principle-definition">Thumbtack's stance is not to remove reviews unless a clear violation of the Content and Review Policy is confirmed.</p>
+          <button class="reveal-btn" aria-label="Show common misread for Clear violation only" onclick="toggleMisread('principle-3')">
+            Show common misread
+            <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+        </div>
+        <div class="principle-misread">
+          <div class="misread-inner">
+            <div class="misread-label">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              Common misread
+            </div>
+            <p class="misread-quote">"This review feels off — let's remove it to be safe."</p>
+            <p class="misread-correction">The default is always to leave the review. If you can't point to a clear violation, it stays.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Principle 4: Refunded leads -->
+      <div class="principle-card" id="principle-4">
+        <div class="principle-front">
+          <div class="principle-number">Principle 4</div>
+          <h2 class="principle-name">Refunded leads don't auto-disqualify</h2>
+          <p class="principle-definition">If a lead is refunded, it does not automatically disqualify a review. Reviews are judged solely on the interaction between the customer and the pro.</p>
+          <button class="reveal-btn" aria-label="Show common misread for Refunded leads" onclick="toggleMisread('principle-4')">
+            Show common misread
+            <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+        </div>
+        <div class="principle-misread">
+          <div class="misread-inner">
+            <div class="misread-label">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              Common misread
+            </div>
+            <p class="misread-quote">"The customer got their money back, so this review shouldn't count."</p>
+            <p class="misread-correction">The financial outcome is a separate question. We judge the interaction between the customer and the pro — not who won the chargeback.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- Marcus Introduction -->
+    <section class="marcus-section">
+      <div class="marcus-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <div class="marcus-content">
+        <div class="marcus-label">Case study</div>
+        <h2 class="marcus-title">Meet Marcus.</h2>
+        <p class="marcus-text">Marcus is a handyman pro on Thumbtack. He just disputed a 1-star review left by a customer named Janelle.</p>
+
+        <div class="marcus-review">
+          <div class="marcus-review-header">
+            <span class="marcus-reviewer">Janelle</span>
+            <span class="marcus-review-stars" aria-label="1 of 5 stars">
+              <span class="star" style="color: var(--tt-yellow);">★</span>
+              <span class="star" style="color: var(--tt-gray);">★</span>
+              <span class="star" style="color: var(--tt-gray);">★</span>
+              <span class="star" style="color: var(--tt-gray);">★</span>
+              <span class="star" style="color: var(--tt-gray);">★</span>
+            </span>
+          </div>
+          <p class="marcus-review-text">"Work was rushed. He showed up late and the cabinet's already loose. Wouldn't recommend."</p>
+        </div>
+
+        <p class="marcus-dispute">Marcus says the review is unfair. He completed the work. He was paid. When Janelle tried to reverse the payment through her bank, Marcus won the chargeback — the bank ruled in his favor. He wants the review removed.</p>
+
+        <p class="marcus-transition">In the next activity, you'll work Marcus's case through the four principles you just learned.</p>
+      </div>
+    </section>
+
+  </div>
+
+</div>
+
+<script>
+  function toggleMisread(cardId) {
+    const card = document.getElementById(cardId);
+    card.classList.toggle('revealed');
+
+    const btn = card.querySelector('.reveal-btn');
+    if (card.classList.contains('revealed')) {
+      btn.innerHTML = 'Hide misread <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
+    } else {
+      btn.innerHTML = 'Show common misread <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
+    }
+  }
+</script>
+
+</body>
+</html>
