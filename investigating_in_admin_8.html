@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Investigating in Admin</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+  :root{
+    --tt-blue:#009FD9;--tt-black:#2F3033;--tt-black-300:#676D73;
+    --tt-gray:#D3D4D5;--tt-gray-300:#E9ECED;--tt-gray-200:#FAFAFA;
+    --tt-white:#FFFFFF;--tt-green:#2DB783;--tt-green-tint:#E8F7F1;
+    --tt-blue-tint:#E5F5FB;--tt-red:#FF5A5F;--tt-red-tint:#FFF0F0;
+    --admin-bg:#F5F5F5;--admin-border:#DDDDDD;--admin-link:#1155CC;
+    --admin-header:#2D3436;--admin-section:#F8F9FA;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{font-family:'Montserrat',-apple-system,sans-serif;color:var(--tt-black);background:#F4F6F9;font-size:13px;line-height:1.4}
+  .sim{max-width:1200px;margin:0 auto;background:white}
+
+  .inst{background:var(--tt-black);padding:20px 28px;display:flex;align-items:flex-start;gap:14px}
+  .inst-ico{width:44px;height:44px;background:var(--tt-blue);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .inst-ico svg{width:24px;height:24px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .inst-txt h1{font-size:18px;font-weight:700;color:white;margin-bottom:4px}
+  .inst-txt .desc{font-size:14px;color:white;line-height:1.6;font-weight:500}
+  .inst-txt .desc strong{color:var(--tt-blue);font-weight:700}
+
+  .view-bar{background:var(--tt-gray-200);border-bottom:1px solid var(--tt-gray-300);padding:0 20px;display:flex;gap:0;align-items:center;justify-content:space-between}
+  .view-tabs{display:flex}
+  .view-tab{padding:10px 18px;font-size:12px;font-weight:600;color:var(--tt-black-300);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-1px;background:none;border-top:none;border-left:none;border-right:none;font-family:inherit;transition:all 0.15s}
+  .view-tab:hover{color:var(--tt-black)}
+  .view-tab.active{color:var(--tt-blue);border-bottom-color:var(--tt-blue)}
+  .view-legend{display:flex;gap:16px;font-size:11px;font-weight:600;padding:10px 0}
+  .leg{display:flex;align-items:center;gap:5px}
+  .ldot{width:9px;height:9px;border-radius:2px}
+  .ldot.g{background:var(--tt-green)}.ldot.b{background:var(--tt-blue)}
+
+  .view{display:none}.view.active{display:block}
+
+  .admin-chrome{background:white;border-bottom:2px solid var(--admin-border)}
+  .admin-top-bar{background:var(--admin-header);padding:8px 20px;display:flex;align-items:center;gap:12px}
+  .admin-logo{font-size:13px;font-weight:700;color:white;letter-spacing:0.5px}
+  .admin-search{flex:1;max-width:320px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:4px;padding:5px 10px;color:rgba(255,255,255,0.5);font-size:11px;font-family:inherit}
+
+  /* Review thread */
+  .review-page{background:var(--admin-bg);padding:16px 20px;min-height:500px}
+  .review-page h2{font-size:14px;font-weight:700;color:var(--tt-black);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--admin-border)}
+  .review-body{display:grid;grid-template-columns:1fr 240px;gap:16px}
+  .review-main{}
+
+  .admin-card{background:white;border:1px solid var(--admin-border);border-radius:4px;margin-bottom:12px;overflow:hidden}
+  .admin-card-header{background:var(--admin-section);padding:8px 14px;font-size:12px;font-weight:700;color:var(--tt-black);border-bottom:1px solid var(--admin-border);text-transform:uppercase;letter-spacing:0.5px}
+
+  .arow{display:grid;grid-template-columns:160px 1fr;border-bottom:1px solid var(--tt-gray-300);cursor:pointer;transition:background 0.15s;position:relative}
+  .arow:last-child{border-bottom:none}
+  .arow.static{cursor:default}
+  .arow:not(.static):hover:not(.revealed){background:rgba(0,159,217,0.04)}
+  .arow.revealed{cursor:default}
+  .arow.evidence.revealed{background:var(--tt-green-tint)}
+  #row-customer:hover{background:rgba(0,159,217,0.04);cursor:pointer}
+  #row-customer.revealed{background:var(--tt-blue-tint)}
+  .arow.path.revealed{background:var(--tt-blue-tint)}
+
+  .arow-label{padding:9px 14px;font-size:11px;color:var(--tt-black-300);font-weight:500;background:var(--admin-section);border-right:1px solid var(--tt-gray-300)}
+  .arow-label.evidence-label{border-left:3px solid var(--tt-green)}
+  .arow-label.path-label{border-left:3px solid var(--tt-blue)}
+  .arow-label.static-label{border-left:3px solid transparent}
+
+  .arow-val{padding:9px 14px;font-size:13px;color:var(--tt-black);display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+  .arow-val .lnk{color:var(--admin-link);text-decoration:underline;cursor:pointer}
+  .arow-val .tag{font-size:9px;color:var(--tt-black-300);background:var(--tt-gray-200);border:1px solid var(--tt-gray-300);padding:2px 6px;border-radius:3px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;flex-shrink:0;margin-top:2px}
+  .arow.revealed .tag{display:none}
+
+  .arow-reveal{display:none;grid-column:1/-1;padding:10px 14px;background:white;border-top:1px solid var(--tt-gray-300);font-size:13px;line-height:1.55}
+  .arow.revealed .arow-reveal{display:block}
+  .arow.evidence.revealed .arow-reveal{border-top-color:var(--tt-green)}
+  .arow.path.revealed .arow-reveal{border-top-color:var(--tt-blue)}
+
+  .rtag{display:inline-block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:3px 8px;border-radius:3px;margin-bottom:5px}
+  .rtag.g{background:var(--tt-green-tint);color:var(--tt-green)}
+  .rtag.b{background:var(--tt-blue-tint);color:var(--tt-blue)}
+  .rtag.r{background:var(--tt-gray-300);color:var(--tt-black-300)}
+
+  .review-text-block{background:#FFFDE7;border-left:4px solid #F9A825;padding:12px 14px;border-radius:0 4px 4px 0;font-size:14px;line-height:1.6;font-style:italic;color:var(--tt-black);margin:4px 0}
+
+  .actions-panel{background:white;border:1px solid var(--admin-border);border-radius:4px;overflow:hidden;align-self:start}
+  .actions-header{background:var(--admin-section);padding:8px 12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--admin-border);color:var(--tt-black);display:flex;align-items:center;gap:6px}
+  .actions-header svg{width:13px;height:13px;stroke:var(--tt-black-300);fill:none;stroke-width:2}
+  .action-item{padding:7px 12px;font-size:12px;color:var(--admin-link);border-bottom:1px solid var(--tt-gray-300);cursor:default;text-decoration:underline}
+  .action-item:last-child{border-bottom:none}
+  .action-item.muted{color:var(--tt-black-300);text-decoration:none;cursor:default}
+
+  .star-full{color:#F4B942}.star-empty{color:#DDD}
+
+  /* Nav strip */
+  .nav-strip{background:white;border-bottom:1px solid var(--tt-gray-300);padding:10px 20px;display:flex;align-items:center;gap:10px;font-size:12px;color:var(--tt-black-300)}
+  .nav-strip .crumb{font-weight:600;color:var(--tt-black)}
+
+  .nav-btn{padding:7px 16px;border:1.5px solid var(--tt-gray-300);border-radius:6px;background:white;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;color:var(--tt-black);transition:all 0.15s;display:inline-flex;align-items:center;gap:6px}
+  .nav-btn:hover{border-color:var(--tt-blue);background:var(--tt-blue-tint);color:var(--tt-blue)}
+  .nav-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .nav-btn.primary{background:var(--tt-blue);border-color:var(--tt-blue);color:white}
+  .nav-btn.primary:hover{background:#0089C2}
+
+  /* ===== USER PAGE ===== */
+  .user-page{background:var(--admin-bg);min-height:600px}
+
+  /* Profile header - matches real Admin */
+  .profile-hdr{background:white;border-bottom:1px solid var(--admin-border);padding:20px 24px;display:flex;align-items:flex-start;justify-content:space-between}
+  .profile-hdr-left{display:flex;align-items:flex-start;gap:20px}
+
+  /* Avatar - matches the circular photo in screenshot */
+  .profile-avatar{width:72px;height:72px;border-radius:50%;background:var(--tt-gray-300);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;border:2px solid var(--admin-border)}
+  .profile-avatar svg{width:40px;height:40px;stroke:var(--tt-black-300);fill:none;stroke-width:1.5}
+
+  .profile-info{}
+  .profile-name{font-size:22px;font-weight:700;color:var(--tt-black);margin-bottom:6px}
+  .profile-ids{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .profile-id-pill{background:var(--admin-section);border:1px solid var(--admin-border);border-radius:4px;padding:3px 10px;font-size:11px;font-weight:600;color:var(--tt-black-300);display:flex;align-items:center;gap:6px}
+  .profile-id-pill strong{color:var(--tt-black);font-size:10px;text-transform:uppercase;letter-spacing:0.5px}
+  .copy-ico{width:12px;height:12px;stroke:var(--tt-black-300);fill:none;stroke-width:2}
+
+  .profile-badges{display:flex;gap:6px}
+  .pbadge{font-size:11px;font-weight:600;padding:4px 10px;border-radius:4px}
+  .pbadge.enabled{background:#E8F5E9;color:#2E7D32}
+  .pbadge.disabled-badge{background:#FCECEA;color:#C62828}
+  .pbadge.customer{background:#E3F2FD;color:#1565C0}
+  .pbadge.pro{background:#FFF3E0;color:#E65100}
+
+  .profile-login-btn{padding:7px 16px;border:1px solid var(--admin-border);border-radius:4px;background:white;font-size:12px;font-family:inherit;cursor:default;display:flex;align-items:center;gap:6px;color:var(--tt-black);align-self:flex-start}
+  .profile-login-btn svg{width:12px;height:12px;stroke:var(--admin-link);fill:none;stroke-width:2}
+
+  /* Details section - matches real Admin */
+  .profile-body{display:grid;grid-template-columns:1fr 280px;gap:0}
+
+  .details-section{border-right:1px solid var(--admin-border)}
+
+  .section-hdr{background:white;padding:12px 20px;border-bottom:1px solid var(--admin-border);display:flex;align-items:center;justify-content:space-between;font-size:14px;font-weight:700}
+  .section-hdr-left{display:flex;align-items:center;gap:8px}
+  .section-hdr svg{width:14px;height:14px;stroke:var(--tt-black-300);fill:none;stroke-width:2}
+  .section-meta{font-size:11px;color:var(--tt-black-300);font-weight:400}
+
+  .detail-table{width:100%;border-collapse:collapse;background:white}
+  .detail-row{display:grid;grid-template-columns:220px 1fr;border-bottom:1px solid var(--tt-gray-300)}
+  .detail-label{padding:10px 20px;font-size:13px;color:var(--tt-black);font-weight:500;background:white}
+  .detail-val{padding:10px 20px;font-size:13px;color:var(--tt-black)}
+  .detail-val .lnk{color:var(--admin-link);text-decoration:underline}
+  .detail-val .status-pill{display:inline-block;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600}
+  .detail-val .status-pill.green{background:#E8F5E9;color:#2E7D32}
+  .detail-val .status-pill.red{background:#FCECEA;color:#C62828}
+  .detail-val .status-pill.gray{background:var(--tt-gray-200);color:var(--tt-black-300)}
+
+  /* Actions panel on user page */
+  .user-actions{background:white;border-left:1px solid var(--admin-border);align-self:start}
+  .ua-section-hdr{background:var(--admin-section);padding:8px 16px;font-size:12px;font-weight:700;color:var(--tt-black);border-bottom:1px solid var(--admin-border);border-top:1px solid var(--admin-border);display:flex;align-items:center;gap:6px;margin-top:0}
+  .ua-section-hdr:first-child{margin-top:0;border-top:none}
+  .ua-section-hdr svg{width:13px;height:13px;stroke:var(--tt-black-300);fill:none;stroke-width:2}
+  .ua-item{padding:7px 16px;font-size:12px;border-bottom:1px solid var(--tt-gray-300);display:block}
+  .ua-item.lnk{color:var(--admin-link);text-decoration:underline;cursor:default}
+  .ua-item.muted{color:var(--tt-black-300);text-decoration:none;cursor:default}
+  .ua-item.ts-target{color:var(--tt-blue);font-weight:600;text-decoration:underline;cursor:pointer;background:var(--tt-blue-tint)}
+  .ua-item.ts-target:hover{background:#D4EDF8}
+
+  /* Linked Users result */
+  /* Linked Users full-page overlay - matches Account Hold Log style */
+  .linked-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:white;z-index:200;overflow-y:auto}
+  .linked-overlay.show{display:block}
+  .lu-admin-bar{background:white;border-bottom:1px solid var(--admin-border);padding:10px 24px;display:flex;align-items:center;justify-content:space-between;font-size:13px}
+  .lu-admin-bar .logo{font-weight:700;font-size:14px;color:var(--tt-black)}
+  .lu-admin-bar .logo span{font-weight:400}
+  .lu-admin-bar .user-info{font-size:12px;color:var(--tt-black-300);display:flex;align-items:center;gap:6px}
+  .lu-admin-bar .user-info svg{width:14px;height:14px;stroke:var(--admin-link);fill:none;stroke-width:2}
+  .lu-body{padding:32px 40px;max-width:900px}
+  .lu-title{font-size:26px;font-weight:700;color:var(--tt-black);margin-bottom:16px}
+  .lu-username{font-size:16px;color:var(--admin-link);margin-bottom:24px;text-decoration:underline;cursor:default}
+  .lu-result{background:var(--tt-green-tint);border-left:4px solid var(--tt-green);padding:16px 20px;border-radius:0 6px 6px 0;font-size:14px;line-height:1.6;color:var(--tt-black);margin-bottom:24px}
+  .lu-result strong{color:var(--tt-green);font-weight:700}
+  .lu-back{padding:9px 20px;border:1.5px solid var(--tt-gray-300);border-radius:6px;background:white;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;color:var(--tt-black);transition:all 0.15s;display:inline-flex;align-items:center;gap:8px}
+  .lu-back:hover{border-color:var(--tt-blue);background:var(--tt-blue-tint);color:var(--tt-blue)}
+  .lu-back svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+  /* Progress */
+  .prog{background:var(--tt-gray-200);border-top:1px solid var(--tt-gray-300);padding:10px 28px;display:flex;align-items:center;justify-content:space-between}
+  .prog-text{font-size:12px;color:var(--tt-black-300)}.prog-text strong{color:var(--tt-black)}
+  .prog-status{font-size:12px;font-weight:600;color:var(--tt-blue)}
+
+  /* Nudge */
+  .nudge-arrow{display:none;position:absolute;right:60px;top:6px;z-index:10;animation:nb 1.5s ease infinite;pointer-events:none}
+  .nudge-arrow svg{width:26px;height:26px;stroke:var(--tt-blue);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 2px 4px rgba(0,159,217,0.3))}
+  .nudge-arrow.show{display:block}
+  .nudge-tip{display:none;position:absolute;right:30px;top:-30px;z-index:10;background:var(--tt-blue);color:white;font-size:11px;font-weight:600;padding:5px 10px;border-radius:5px;white-space:nowrap;pointer-events:none;animation:nf 2s ease infinite}
+  .nudge-tip.show{display:block}
+  .nudge-tip:after{content:'';position:absolute;bottom:-5px;right:12px;width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:5px solid var(--tt-blue)}
+  @keyframes nb{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+  @keyframes nf{0%,100%{opacity:0.8}50%{opacity:1}}
+
+  .note-box{margin:12px 0;padding:10px 14px;background:var(--tt-blue-tint);border-radius:6px;font-size:12px;line-height:1.5;color:var(--tt-black)}
+</style>
+</head>
+<body>
+<div class="sim">
+
+  <div class="inst">
+    <div class="inst-ico"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+    <div class="inst-txt">
+      <h1>Investigating in Admin</h1>
+      <p class="desc"><strong>Step 1:</strong> Click each highlighted field in the review thread to learn what it is. <strong>Step 2:</strong> Click Janelle's name to go to her user page, then click Show Linked Users in the Trust &amp; Safety section.</p>
+    </div>
+  </div>
+
+  <div class="view-bar">
+    <div class="view-tabs">
+      <button class="view-tab active" onclick="switchView('review')">Review Thread</button>
+      <button class="view-tab" id="tab-customer" onclick="switchView('customer')">Janelle's User Page</button>
+    </div>
+    <div class="view-legend">
+      <div class="leg"><div class="ldot g"></div> Primary evidence</div>
+      <div class="leg"><div class="ldot b"></div> Navigation path</div>
+    </div>
+  </div>
+
+  <!-- ===== VIEW 1: REVIEW THREAD ===== -->
+  <div class="view active" id="view-review">
+    <div class="admin-chrome">
+      <div class="admin-top-bar">
+        <span class="admin-logo">Thumbtack Admin</span>
+        <input class="admin-search" placeholder="Search users, pros, reviews..." disabled>
+      </div>
+    </div>
+
+    <div class="review-page">
+      <h2>Review #55328764799502XXXX</h2>
+      <div class="review-body">
+        <div class="review-main">
+
+          <div class="admin-card">
+            <div class="admin-card-header">Summary</div>
+
+            <div class="arow static"><div class="arow-label static-label">ID</div><div class="arow-val">55328764799502XXXX</div></div>
+
+            <div class="arow static"><div class="arow-label static-label">Rating</div><div class="arow-val"><span><span class="star-full">★</span><span class="star-empty">★</span><span class="star-empty">★</span><span class="star-empty">★</span><span class="star-empty">★</span>&nbsp;(1 star)</span></div></div>
+
+            <div class="arow path" id="row-customer" onclick="goToCustomer()" style="position:relative;cursor:pointer">
+              <div class="arow-label path-label">Customer</div>
+              <div class="arow-val"><span class="lnk" style="font-weight:600">Janelle Rivera ↗</span></div>
+              <div class="nudge-arrow" id="nudge-arrow"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="5 12 12 19 19 12"/></svg></div>
+              <div class="nudge-tip" id="nudge-tip">Click highlighted fields</div>
+            </div>
+
+            <div class="arow evidence" onclick="revealRow(this,'evidence')">
+              <div class="arow-label evidence-label">Professional</div>
+              <div class="arow-val"><span class="lnk">Marcus Thompson</span><span class="tag">Tap</span></div>
+              <div class="arow-reveal"><span class="rtag g">Context</span><br>Links to the pro's user page in Admin. Useful if you need to check the pro's account details, history, or account standing.</div>
+            </div>
+
+            <div class="arow evidence" onclick="revealRow(this,'evidence')">
+              <div class="arow-label evidence-label">Business</div>
+              <div class="arow-val"><span>THOMPSON HANDYMAN SERVICES</span><span class="tag">Tap</span></div>
+              <div class="arow-reveal"><span class="rtag g">Context</span><br>The pro's business name. Useful for understanding the scope of work and whether the review matches the service offered.</div>
+            </div>
+
+            <div class="arow static"><div class="arow-label static-label">Created</div><div class="arow-val">May 8, 2026, 10:22 AM</div></div>
+
+            <div class="arow evidence" onclick="revealRow(this,'evidence')">
+              <div class="arow-label evidence-label">Project</div>
+              <div class="arow-val"><span class="lnk">Handyman — Cabinet Installation</span><span class="tag">Tap</span></div>
+              <div class="arow-reveal"><span class="rtag g">What was the job</span><br>The type of work the pro was hired for. Helps you assess whether the review content matches the actual service. A review mentioning "landscaping" on a "plumbing" project would be a red flag.</div>
+            </div>
+
+            <div class="arow evidence" onclick="revealRow(this,'evidence')">
+              <div class="arow-label evidence-label">Negotiation</div>
+              <div class="arow-val"><span class="lnk">View quote and back-and-forth</span><span class="tag">Tap</span></div>
+              <div class="arow-reveal"><span class="rtag g">The financial back-and-forth</span><br>Clickable link to the quote and communication history between Marcus and Janelle. In Marcus's case, this confirms a $350 quote was sent and accepted — relevant context for the chargeback claim in General Comments.</div>
+            </div>
+          </div>
+
+          <div class="admin-card">
+            <div class="admin-card-header">Revision History</div>
+
+            <div class="arow evidence" onclick="revealRow(this,'evidence')">
+              <div class="arow-label evidence-label">Text</div>
+              <div class="arow-val" style="flex-direction:column;align-items:flex-start;gap:6px">
+                <div class="review-text-block">"Work was rushed. He showed up late and the cabinet's already loose. Wouldn't recommend."</div>
+                <span class="tag" style="align-self:flex-end">Tap</span>
+              </div>
+              <div class="arow-reveal"><span class="rtag g">Primary evidence</span><br>The actual review text. This is your most important field. Read it against the Dispute Reason and General Comments. In Marcus's case — the review criticizes workmanship, but none of that is a policy violation. The dispute claims "Fake reviews," but this review doesn't show signs of being fake.</div>
+            </div>
+
+            <div class="arow static"><div class="arow-label static-label">Created Time</div><div class="arow-val">May 8, 2026, 10:22 AM</div></div>
+
+            <div class="arow evidence" onclick="revealRow(this,'evidence')">
+              <div class="arow-label evidence-label">Customer IP</div>
+              <div class="arow-val"><span class="lnk">192.168.XX.XX</span><span class="tag">Tap</span></div>
+              <div class="arow-reveal"><span class="rtag r">Course 5</span><br>May be relevant for fake-review investigations — multiple reviews from the same IP can be a red flag. You'll learn IP investigation in Course 5. For now, just know it exists.</div>
+            </div>
+
+            <div class="arow evidence" onclick="revealRow(this,'evidence')">
+              <div class="arow-label evidence-label">Characteristics</div>
+              <div class="arow-val"><span>WORK_QUALITY</span><span class="tag">Tap</span></div>
+              <div class="arow-reveal"><span class="rtag g">Tags on the review</span><br>Tags the customer selects when leaving their review. Useful for quickly understanding what aspects of the job they were commenting on.</div>
+            </div>
+
+            <div class="arow static"><div class="arow-label static-label">Photos</div><div class="arow-val" style="color:var(--tt-black-300)">(none attached)</div></div>
+          </div>
+
+          <div style="padding:8px 0">
+            <button class="nav-btn primary" onclick="switchView('customer')">
+              <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              Go to Janelle's user page to check Linked Users →
+            </button>
+          </div>
+
+        </div>
+
+        <div>
+          <div class="actions-panel">
+            <div class="actions-header">Actions</div>
+            <div class="action-item">Edit Review</div>
+            <div class="action-item">Delete Review Text</div>
+            <div class="action-item">Delete Review</div>
+            <div class="action-item">Associate with Different Customer</div>
+            <div class="action-item">Associate with different bid</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== VIEW 2: CUSTOMER USER PAGE ===== -->
+  <div class="view" id="view-customer">
+    <div class="admin-chrome">
+      <div class="admin-top-bar">
+        <span class="admin-logo">Thumbtack Admin</span>
+        <input class="admin-search" placeholder="Search users, pros, reviews..." disabled>
+      </div>
+    </div>
+
+    <div class="nav-strip">
+      <button class="nav-btn" onclick="switchView('review')">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg> Back to Review Thread
+      </button>
+      <svg viewBox="0 0 24 24" style="width:10px;height:10px;stroke:var(--tt-black-300);fill:none;stroke-width:2"><polyline points="9 18 15 12 9 6"/></svg>
+      <span class="crumb">Janelle Rivera — User Page</span>
+    </div>
+
+    <!-- Profile header matching real Admin -->
+    <div class="profile-hdr">
+      <div class="profile-hdr-left">
+        <div class="profile-avatar">
+          <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div class="profile-info">
+          <div class="profile-name">Janelle Rivera</div>
+          <div class="profile-ids">
+            <div class="profile-id-pill"><strong>PK</strong> 549161589668XXXXXX <svg class="copy-ico" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></div>
+            <div class="profile-id-pill"><strong>ID [DEPRECATED]</strong> 7478XXXX <svg class="copy-ico" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></div>
+          </div>
+          <div class="profile-badges">
+            <span class="pbadge enabled">Enabled</span>
+            <span class="pbadge customer">Customer</span>
+          </div>
+        </div>
+      </div>
+      <button class="profile-login-btn">Log in as user <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></button>
+    </div>
+
+    <div class="profile-body">
+
+      <!-- Details section -->
+      <div class="details-section">
+        <div class="section-hdr">
+          <div class="section-hdr-left"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg> Details</div>
+          <span class="section-meta">Owner: admin_platform</span>
+        </div>
+
+        <div class="detail-row"><div class="detail-label">Email</div><div class="detail-val">j.rivera.sample@email.com</div></div>
+        <div class="detail-row"><div class="detail-label">Privileges</div><div class="detail-val"><span class="lnk">Modify</span></div></div>
+        <div class="detail-row"><div class="detail-label">Time zone</div><div class="detail-val">Pacific Time Zone</div></div>
+        <div class="detail-row"><div class="detail-label">Signed up</div><div class="detail-val">8 months ago • Apr 3, 2026, 9:14 AM</div></div>
+        <div class="detail-row"><div class="detail-label">Signup platform</div><div class="detail-val">Web</div></div>
+        <div class="detail-row"><div class="detail-label">Contact preferences</div><div class="detail-val"><span style="color:var(--tt-black-300)">User is not subscribed to any contact methods.</span></div></div>
+        <div class="detail-row"><div class="detail-label">Identity status</div><div class="detail-val"><span class="status-pill gray">Unknown</span></div></div>
+        <div class="detail-row"><div class="detail-label">Pro Account hold flags</div><div class="detail-val"><span class="status-pill green">No flags applied</span></div></div>
+        <div class="detail-row"><div class="detail-label">Customer Account hold flags</div><div class="detail-val"><span class="status-pill green">No holds applied</span></div></div>
+        <div class="detail-row"><div class="detail-label">Banned status</div><div class="detail-val"><span class="status-pill green">Not blocklisted</span></div></div>
+        <div class="detail-row"><div class="detail-label">Referral Program</div><div class="detail-val">Eligible</div></div>
+        <div class="detail-row"><div class="detail-label">Partnership</div><div class="detail-val">Not in partnership</div></div>
+        <div class="detail-row"><div class="detail-label">Terms accepted</div><div class="detail-val">Accepted Terms of Use effective 2026-03-01</div></div>
+        <div class="detail-row"><div class="detail-label">Num free contacts</div><div class="detail-val">0</div></div>
+        <div class="detail-row"><div class="detail-label">Has Active Top Pro Badge</div><div class="detail-val">False</div></div>
+      </div>
+
+      <!-- Actions panel - right column -->
+      <div class="user-actions">
+        <div style="padding:8px 16px;font-size:13px;font-weight:600;color:var(--tt-black);border-bottom:1px solid var(--admin-border);display:flex;align-items:center;justify-content:space-between;background:white">
+          Actions
+          <span style="font-size:11px;color:var(--tt-black-300);font-weight:400">Owner: admin_platform</span>
+        </div>
+
+        <div class="ua-section-hdr"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Basic</div>
+        <div class="ua-item lnk">Create New User</div>
+        <div class="ua-item muted">Edit User</div>
+        <div class="ua-item muted">Add Service</div>
+        <div class="ua-item muted">Reset password</div>
+
+        <div class="ua-section-hdr"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg> Account Status</div>
+        <div class="ua-item muted">Admin Delete</div>
+        <div class="ua-item muted">Admin Ghost</div>
+        <div class="ua-item muted">Admin Undelete</div>
+        <div class="ua-item muted">Admin Unghost</div>
+        <div class="ua-item lnk">Add Pro Account Hold</div>
+        <div class="ua-item muted">Remove Pro Account Hold</div>
+        <div class="ua-item muted">Remove Past-Due Balance Hold</div>
+        <div class="ua-item lnk">Add Customer Account Hold</div>
+        <div class="ua-item muted">Remove Customer Account Hold</div>
+        <div class="ua-item lnk">Deletion and Ghost Logs</div>
+        <div class="ua-item lnk">Pro Account Hold Logs</div>
+        <div class="ua-item lnk">Customer Account Hold Logs</div>
+
+        <div class="ua-section-hdr"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Payments</div>
+        <div class="ua-item lnk">Payout Gateway Account Details</div>
+        <div class="ua-item lnk">Pro-Payment Summary</div>
+        <div class="ua-item lnk">Promotional Credits</div>
+        <div class="ua-item lnk">View Payout Eligibility</div>
+        <div class="ua-item lnk">Refund Requests</div>
+        <div class="ua-item lnk">Marketplace Earnings History</div>
+
+        <div class="ua-section-hdr" style="border-top:2px solid var(--tt-blue);background:var(--tt-blue-tint);color:var(--tt-blue)"><svg viewBox="0 0 24 24" style="stroke:var(--tt-blue)"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Trust &amp; Safety</div>
+        <div class="ua-item lnk">Background Check</div>
+        <div class="ua-item lnk">View Blocklist Record</div>
+        <div class="ua-item lnk">Remove User from Blocklist</div>
+        <div class="ua-item muted">Add User to Blocklist</div>
+        <div class="ua-item ts-target" onclick="showLinkedUsers()" id="show-lu-btn">Show Linked Users</div>
+        <div class="ua-item lnk">Show Verification Data</div>
+        <div class="ua-item lnk">Override User Link</div>
+        <div class="ua-item lnk">Add Checkr Verification</div>
+        <div class="ua-item lnk">Edit Identity Information</div>
+        <div class="ua-item lnk">LADS Portal</div>
+        <div class="ua-item lnk">Policy Exceptions</div>
+        <div class="ua-item lnk">Send Checkr Invitation</div>
+
+
+
+      </div>
+    </div>
+  </div>
+
+  <div class="prog">
+    <span class="prog-text">Fields explored: <strong id="cnt">0</strong> of 7</span>
+    <span class="prog-status" id="stat">Click highlighted fields to learn more</span>
+  </div>
+
+      </div><!-- /user-actions -->
+    </div><!-- /profile-body -->
+  </div><!-- /view-customer -->
+
+  <!-- LINKED USERS FULL PAGE OVERLAY -->
+  <div class="linked-overlay" id="linked-overlay">
+    <div class="lu-admin-bar">
+      <span class="logo">Thumbtack <span>Admin</span></span>
+      <span class="user-info">Kendl Jarosch (kjarosch) <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></span>
+    </div>
+    <div class="lu-body">
+      <h2 class="lu-title">Linked Users</h2>
+      <div class="lu-username">Janelle Rivera</div>
+      <div class="lu-result">
+        <strong>No linked accounts found.</strong><br>
+        No signs of competitor contact abuse or deceptive patterns on Janelle's account. A clean result is still a result — it tells you her account is legitimate. You can now return to the Support Process and make your call.
+      </div>
+      <button class="lu-back" onclick="closeLinkedUsers()">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        Back to Janelle's user page
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  var total=7, found=0, hasClicked=false, nudgeTimer=null;
+
+  function switchView(v){
+    document.querySelectorAll('.view').forEach(function(el){el.classList.remove('active')});
+    document.querySelectorAll('.view-tab').forEach(function(el){el.classList.remove('active')});
+    document.getElementById('view-'+v).classList.add('active');
+    if(v==='review') document.querySelectorAll('.view-tab')[0].classList.add('active');
+    else document.querySelectorAll('.view-tab')[1].classList.add('active');
+  }
+
+  function revealRow(el, type){
+    if(el.classList.contains('revealed')) return;
+    el.classList.add('revealed');
+    hasClicked=true; hideNudge();
+    found++;
+    document.getElementById('cnt').textContent=found;
+    if(found===total){document.getElementById('stat').textContent='All fields explored ✓';document.getElementById('stat').style.color='#2DB783';}
+    else{document.getElementById('stat').textContent=found+' of '+total+' explored';}
+  }
+
+  function showLinkedUsers(){
+    var btn=document.getElementById('show-lu-btn');
+    // Track progress first time
+    if(!btn.classList.contains('used')){
+      btn.classList.add('used');
+      btn.style.opacity='0.6';
+      hasClicked=true; hideNudge();
+      found++;
+      document.getElementById('cnt').textContent=found;
+      if(found===total){document.getElementById('stat').textContent='All fields explored ✓';document.getElementById('stat').style.color='#2DB783';}
+      else{document.getElementById('stat').textContent=found+' of '+total+' explored';}
+    }
+    document.getElementById('linked-overlay').classList.add('show');
+    window.scrollTo(0,0);
+  }
+
+  function closeLinkedUsers(){
+    document.getElementById('linked-overlay').classList.remove('show');
+  }
+
+  function goToCustomer(){
+    // Mark the customer row as visited
+    var row = document.getElementById('row-customer');
+    if(!row.classList.contains('revealed')){
+      row.classList.add('revealed');
+      document.getElementById('janelle-tag').style.display='none';
+      hasClicked=true; hideNudge();
+      found++;
+      document.getElementById('cnt').textContent=found;
+      if(found===total){document.getElementById('stat').textContent='All fields explored ✓';document.getElementById('stat').style.color='#2DB783';}
+      else{document.getElementById('stat').textContent=found+' of '+total+' explored';}
+    }
+    switchView('customer');
+  }
+
+  function showNudge(){
+    if(hasClicked) return;
+    document.getElementById('nudge-arrow').classList.add('show');
+    document.getElementById('nudge-tip').classList.add('show');
+  }
+
+  function hideNudge(){
+    document.getElementById('nudge-arrow').classList.remove('show');
+    document.getElementById('nudge-tip').classList.remove('show');
+    if(nudgeTimer) clearTimeout(nudgeTimer);
+  }
+
+  nudgeTimer=setTimeout(showNudge,5000);
+</script>
+</body>
+</html>
