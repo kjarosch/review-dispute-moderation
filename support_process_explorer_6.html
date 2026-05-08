@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Support Process: What to Read and When</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+  :root{--tt-blue:#009FD9;--tt-black:#2F3033;--tt-black-300:#676D73;--tt-gray:#D3D4D5;--tt-gray-300:#E9ECED;--tt-gray-200:#FAFAFA;--tt-white:#FFFFFF;--tt-green:#2DB783;--tt-green-tint:#E8F7F1;--tt-blue-tint:#E5F5FB;--sf-blue:#0176D3;--sf-nav:#F3F3F3;--sf-border:#C9C9C9;--sf-link:#0176D3;--sf-orange:#E87722}
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{font-family:'Montserrat',-apple-system,BlinkMacSystemFont,sans-serif;color:var(--tt-black);background:#F4F6F9;line-height:1.4;font-size:13px}
+  .sim{max-width:1200px;margin:0 auto;background:var(--tt-white)}
+  .inst{background:var(--tt-black);padding:20px 28px;display:flex;align-items:flex-start;gap:14px}
+  .inst-ico{width:44px;height:44px;background:var(--tt-blue);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .inst-ico svg{width:24px;height:24px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .inst-txt h1{font-size:20px;font-weight:700;color:white;margin-bottom:6px}
+  .inst-txt .desc{font-size:15px;color:white;line-height:1.6;font-weight:500}
+  .inst-txt .desc strong{color:var(--tt-blue);font-weight:700}
+  .inst-txt .hint{font-size:14px;color:var(--tt-blue);font-weight:600;margin-top:6px}
+  .legend{display:flex;gap:24px;padding:10px 28px;background:var(--tt-gray-200);border-bottom:1px solid var(--tt-gray-300);font-size:12px;font-weight:600}
+  .leg{display:flex;align-items:center;gap:6px}
+  .ldot{width:10px;height:10px;border-radius:3px}.ldot.g{background:var(--tt-green)}.ldot.r{background:var(--tt-gray)}
+  .rule{background:var(--tt-blue-tint);border-left:4px solid var(--tt-blue);padding:14px 28px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--tt-gray-300)}
+  .rule svg{width:22px;height:22px;stroke:var(--tt-blue);fill:none;stroke-width:2;flex-shrink:0;stroke-linecap:round;stroke-linejoin:round}
+  .rule p{font-size:14px;line-height:1.5}.rule strong{font-weight:700}
+  .rechdr{background:white;padding:12px 20px;border-bottom:1px solid var(--sf-border);display:flex;align-items:center;justify-content:space-between}
+  .rechdr-l{display:flex;align-items:center;gap:12px}
+  .recico{width:36px;height:36px;background:var(--sf-orange);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .recico svg{width:20px;height:20px;stroke:white;fill:none;stroke-width:2}
+  .recinfo .ty{font-size:11px;color:var(--tt-black-300)}.recinfo .ti{font-size:16px;font-weight:700}
+  .recacts{display:flex;gap:6px}
+  .sbtn{padding:6px 12px;border:1px solid var(--sf-border);border-radius:4px;background:white;font-size:11px;cursor:default;color:var(--tt-black);font-family:inherit}
+  .recmeta{background:white;padding:6px 20px 10px;border-bottom:1px solid var(--sf-border);display:flex;gap:32px}
+  .rmf label{display:block;font-size:10px;color:var(--tt-black-300);text-transform:uppercase;letter-spacing:0.5px}.rmf span{font-size:12px;font-weight:500}
+  .rectabs{display:flex;padding:0 20px;background:white;border-bottom:1px solid var(--sf-border)}
+  .rtab{padding:10px 16px;font-size:13px;color:var(--tt-black-300);font-weight:500;border-bottom:3px solid transparent;margin-bottom:-1px;cursor:default}
+  .rtab.on{color:var(--sf-link);border-bottom-color:var(--sf-link);font-weight:600}
+  .recbody{display:grid;grid-template-columns:1fr 320px;min-height:600px}
+  .recfields{padding:0;background:white}
+  .frow{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--tt-gray-300)}
+  .fcell{padding:12px 16px;position:relative}
+  .fcell:first-child{border-right:1px solid var(--tt-gray-300)}
+  .fcell.clickable{cursor:pointer;transition:background 0.15s}
+  .fcell.clickable:hover:not(.revealed){background:rgba(0,159,217,0.04)}
+  .fcell.clickable.revealed{cursor:default}
+  .fcell.left-evidence{border-left:3px solid var(--tt-green)}
+  .fcell.right-decision{border-left:3px solid var(--tt-gray-300)}
+  .fcell.static{border-left:3px solid transparent}
+  .fcell.left-evidence.revealed{background:var(--tt-green-tint)}
+  .fcell.right-decision.revealed{background:var(--tt-gray-200)}
+  .flbl{font-size:11px;color:var(--tt-black-300);margin-bottom:3px;display:flex;align-items:center;gap:6px}
+  .fval{font-size:14px;color:var(--tt-black);font-weight:500;display:flex;align-items:center;justify-content:space-between}
+  .fval .link{color:var(--sf-link)}.fval .pencil{width:14px;height:14px;color:var(--tt-black-300);opacity:0.4;flex-shrink:0}
+  .fval .pencil svg{width:100%;height:100%;stroke:currentColor;fill:none;stroke-width:2}
+  .ftap{font-size:9px;color:var(--tt-black-300);text-transform:uppercase;letter-spacing:0.5px;font-weight:700;background:var(--tt-gray-200);padding:2px 7px;border-radius:3px;border:1px solid var(--tt-gray-300);margin-left:auto;flex-shrink:0}
+  .fcell.revealed .ftap{display:none}
+  .freveal{max-height:0;overflow:hidden;transition:max-height 0.35s ease}
+  .fcell.revealed .freveal{max-height:300px;margin-top:8px}
+  .freveal-inner{padding:10px 12px;background:white;border:1.5px solid var(--tt-gray-300);border-radius:8px;font-size:13px;line-height:1.6;color:var(--tt-black)}
+  .fcell.left-evidence .freveal-inner{border-color:var(--tt-green)}
+  .fcell.right-decision .freveal-inner{border-color:var(--tt-gray)}
+  .rtag{display:inline-block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:3px 8px;border-radius:3px;margin-bottom:6px}
+  .rtag.g{background:var(--tt-green-tint);color:var(--tt-green)}
+  .rtag.b{background:var(--tt-blue-tint);color:var(--sf-blue)}
+  .rtag.r{background:var(--tt-gray-300);color:var(--tt-black-300)}
+  .dd-overlay{display:none;position:absolute;top:100%;left:16px;z-index:50;background:white;border:2px solid var(--sf-blue);border-radius:6px;box-shadow:0 4px 16px rgba(0,0,0,0.12);min-width:320px;max-height:360px;overflow-y:auto;animation:ddIn 0.2s ease}
+  .dd-overlay.show{display:block}
+  @keyframes ddIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+  .dd-item{padding:10px 16px;font-size:13px;color:var(--tt-black);cursor:default;border-bottom:1px solid var(--tt-gray-300);display:flex;align-items:center;gap:8px}
+  .dd-item:last-child{border-bottom:none}.dd-item:hover{background:var(--tt-gray-200)}
+  .dd-item .check{width:16px;height:16px;color:var(--sf-blue);flex-shrink:0}
+  .dd-item .check svg{width:100%;height:100%;stroke:currentColor;fill:none;stroke-width:2.5}
+  .dd-item .nocheck{width:16px;height:16px;flex-shrink:0}
+  .frow.tall .fcell{min-height:80px}
+  .gc-text{font-size:13px;color:var(--tt-black);line-height:1.55;margin-top:4px}
+  .sysinfo{border-top:2px solid var(--sf-border);padding:16px 24px;background:white}
+  .sysinfo-title{font-size:13px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+  .sysinfo-title svg{width:14px;height:14px;stroke:var(--tt-black-300);fill:none;stroke-width:2}
+  .sysinfo-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 24px;font-size:12px}
+  .sysinfo-grid label{color:var(--tt-black-300);font-size:10px;text-transform:uppercase;letter-spacing:0.5px}
+  .sysinfo-grid span{font-weight:500}.sysinfo-grid .link{color:var(--sf-link)}
+  .sidebar{border-left:1px solid var(--sf-border);background:var(--sf-nav)}
+  .sb-tabs{display:flex;border-bottom:1px solid var(--sf-border);background:white}
+  .sb-tab{padding:10px 20px;font-size:13px;color:var(--tt-black-300);font-weight:500;border-bottom:2px solid transparent;cursor:default}
+  .sb-tab.on{color:var(--sf-link);border-bottom-color:var(--sf-link);font-weight:600}
+  .sb-area{padding:12px 16px}
+  .sb-compose{display:flex;gap:8px;margin-bottom:12px}
+  .sb-input{flex:1;border:1px solid var(--sf-border);border-radius:4px;padding:7px 10px;font-size:12px;font-family:inherit;color:var(--tt-black-300)}
+  .sb-share{padding:7px 16px;background:var(--sf-blue);color:white;border:none;border-radius:4px;font-size:12px;font-weight:600;font-family:inherit;cursor:default}
+  .sb-search{display:flex;gap:6px;align-items:center}
+  .sb-search-ico{width:24px;height:24px;border:1px solid var(--sf-border);border-radius:4px;display:flex;align-items:center;justify-content:center}
+  .sb-search-ico svg{width:12px;height:12px;stroke:var(--tt-black-300);fill:none;stroke-width:2}
+  .sb-search-input{flex:1;border:1px solid var(--sf-border);border-radius:4px;padding:6px 10px;font-size:12px;font-family:inherit;color:var(--tt-black-300)}
+  .prog{background:var(--tt-gray-200);border-top:1px solid var(--tt-gray-300);padding:10px 28px;display:flex;align-items:center;justify-content:space-between}
+  .prog-text{font-size:12px;color:var(--tt-black-300)}.prog-text strong{color:var(--tt-black);font-weight:600}
+  .prog-status{font-size:12px;font-weight:600;color:var(--tt-blue)}
+  .nudge-arrow{display:none;position:absolute;top:8px;left:120px;z-index:10;animation:nudgeBounce 1.5s ease infinite;pointer-events:none}
+  .nudge-arrow svg{width:28px;height:28px;stroke:var(--tt-blue);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 2px 4px rgba(0,159,217,0.3))}
+  .nudge-arrow.show{display:block}
+  @keyframes nudgeBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+  .nudge-tooltip{display:none;position:absolute;top:-32px;left:60px;z-index:10;background:var(--tt-blue);color:white;font-size:11px;font-weight:600;padding:6px 12px;border-radius:6px;white-space:nowrap;pointer-events:none;animation:nudgeFade 2s ease infinite}
+  .nudge-tooltip.show{display:block}
+  @keyframes nudgeFade{0%,100%{opacity:0.8}50%{opacity:1}}
+  .nudge-tooltip:after{content:'';position:absolute;bottom:-6px;left:16px;width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:6px solid var(--tt-blue)}
+</style>
+</head>
+<body>
+<div class="sim">
+
+  <div class="inst">
+    <div class="inst-ico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="3" x2="12" y2="21"/></svg></div>
+    <div class="inst-txt">
+      <h1>The Support Process: What to Read and When</h1>
+      <p class="desc">This is the Review Dispute record — <strong>the screen you just navigated to. Click any field to learn what it does and why it matters.</strong></p>
+      <p class="hint">Start with the left side — that's where the evidence lives.</p>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="leg"><div class="ldot g"></div> Read first — evidence from the frontline rep</div>
+    <div class="leg"><div class="ldot r"></div> Your decision fields — covered in Course 3</div>
+  </div>
+
+  <!-- THE RULE: positioned between legend and SF record -->
+  <div class="rule">
+    <svg viewBox="0 0 24 24"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 00-4 12.7c.6.5 1 1.2 1 2v.3h6v-.3c0-.8.4-1.5 1-2A7 7 0 0012 2z"/></svg>
+    <p><strong>The rule:</strong> Always read the left side completely before touching the right side. Understand the pro's claim before you investigate. Then go to Admin.</p>
+  </div>
+
+  <div class="rechdr">
+    <div class="rechdr-l">
+      <div class="recico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg></div>
+      <div class="recinfo"><div class="ty">Support Process</div><div class="ti">Review Dispute for Case 14082615</div></div>
+    </div>
+    <div class="recacts"><div class="sbtn">+ Follow</div><div class="sbtn">Edit</div><div class="sbtn">New Note</div><div class="sbtn">Clone</div></div>
+  </div>
+
+  <div class="recmeta">
+    <div class="rmf"><label>Status</label><span>New</span></div>
+    <div class="rmf"><label>Created Date/Time</label><span>5/12/2026 2:15 PM</span></div>
+    <div class="rmf"><label>Date/Time Closed</label><span></span></div>
+    <div class="rmf"><label>Assignee</label><span></span></div>
+  </div>
+
+  <div class="rectabs"><div class="rtab on">Details</div><div class="rtab">Files</div><div class="rtab">History</div></div>
+
+  <div class="recbody">
+    <div class="recfields">
+
+      <!-- Row 1: Record Name / Status -->
+      <div class="frow" style="position:relative">
+        <div class="fcell left-evidence clickable" onclick="rev(this)">
+          <div class="flbl">Record Name <span class="ftap">Tap</span></div>
+          <div class="fval"><span>Review Dispute for Case 14082615</span><span class="pencil"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg></span></div>
+          <div class="freveal"><div class="freveal-inner"><span class="rtag g">Context</span><br>Confirms which case this Support Process belongs to. Auto-populates when the frontline rep creates the record.</div></div>
+        </div>
+        <div class="fcell static">
+          <div class="flbl">Status</div>
+          <div class="fval"><span>New</span></div>
+        </div>
+        <div class="nudge-arrow" id="nudge-arrow"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="5 12 12 19 19 12"/></svg></div>
+        <div class="nudge-tooltip" id="nudge-tooltip">Click any highlighted field</div>
+      </div>
+
+      <!-- Row 2: Case / Escalated Date -->
+      <div class="frow">
+        <div class="fcell left-evidence clickable" onclick="rev(this)">
+          <div class="flbl">Case <span class="ftap">Tap</span></div>
+          <div class="fval"><span class="link">14082615</span><span class="pencil"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg></span></div>
+          <div class="freveal"><div class="freveal-inner"><span class="rtag g">Reference</span><br>Clickable link back to the parent case. Use this if you need to check case details, emails, or the contact record.</div></div>
+        </div>
+        <div class="fcell static">
+          <div class="flbl">Escalated Date</div>
+          <div class="fval"><span>5/12/2026 2:15 PM</span><span class="pencil"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg></span></div>
+        </div>
+      </div>
+
+      <!-- Row 3: Case Owner / Reviewed by Date -->
+      <div class="frow">
+        <div class="fcell left-evidence clickable" onclick="rev(this)">
+          <div class="flbl">Case Owner Name <span class="ftap">Tap</span></div>
+          <div class="fval"><span>Proactive MI Queue</span><span class="pencil"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg></span></div>
+          <div class="freveal"><div class="freveal-inner"><span class="rtag g">Ownership</span><br>Confirms this case is assigned to the Proactive MI Queue — your team. If this shows a different queue, the case may have been misrouted.</div></div>
+        </div>
+        <div class="fcell right-decision clickable" onclick="rev(this)">
+          <div class="flbl">Reviewed by Date <span class="ftap">Tap</span></div>
+          <div class="fval"><span style="color:var(--tt-black-300)">—</span><span class="pencil"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg></span></div>
+          <div class="freveal"><div class="freveal-inner"><span class="rtag r">Course 3</span><br>When you reviewed the case. Gets filled when you save your decision.</div></div>
+        </div>
+      </div>
+
+      <!-- Row 4: (empty) / Reviewed By -->
+      <div class="frow">
+        <div class="fcell" style="border-left:3px solid transparent"></div>
+        <div class="fcell right-decision clickable" onclick="rev(this)">
+          <div class="flbl">Reviewed By <span class="ftap">Tap</span></div>
+          <div class="fval"><span style="color:var(--tt-black-300)">—</span><span class="pencil"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg></span></div>
+          <div class="freveal"><div class="freveal-inner"><span class="rtag r">Course 3</span><br>Your name goes here when you save your decision. Auto-populates.</div></div>
+        </div>
+      </div>
+
+      <!-- Row 5: Dispute Reason / Manager Decision -->
+      <div class="frow">
+        <div class="fcell left-evidence clickable" onclick="rev(this)" style="position:relative" id="dr-cell">
+          <div class="flbl">Dispute Reason <span class="ftap">Tap</span></div>
+          <div class="fval"><span>Fake reviews</span><span class="pencil"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg></span></div>
+          <div class="freveal"><div class="freveal-inner"><span class="rtag g">Start here</span><br>This dropdown tells you why the pro is disputing. Read it before anything else — it frames your entire investigation.<br><br><strong style="font-size:12px;color:var(--sf-link);cursor:pointer" onclick="event.stopPropagation();toggleDD('dr-dd')">View all Dispute Reason options ▾</strong><div class="dd-overlay" id="dr-dd"><div class="dd-item"><span class="nocheck"></span> --None--</div><div class="dd-item"><span class="nocheck"></span> Blacklisted words</div><div class="dd-item"><span class="nocheck"></span> Duplicate update</div><div class="dd-item"><span class="check"><svg viewBox="0 0 24 24"><polyline points="5 12 10 17 19 8"/></svg></span> <strong>Fake reviews</strong></div><div class="dd-item"><span class="nocheck"></span> No interaction</div><div class="dd-item"><span class="nocheck"></span> Personal identifiable info/pictures</div><div class="dd-item"><span class="nocheck"></span> Request violates user guidelines</div><div class="dd-item"><span class="nocheck"></span> Review/update posted outside reasonable amount of time</div><div class="dd-item"><span class="nocheck"></span> Review bug</div><div class="dd-item"><span class="nocheck"></span> Review intended for TT/Not related</div><div class="dd-item"><span class="nocheck"></span> Verifying review</div></div></div></div>
+        </div>
+        <div class="fcell right-decision clickable" onclick="rev(this)">
+          <div class="flbl">Manager Decision <span class="ftap">Tap</span></div>
+          <div class="fval"><span>Awaiting Decision</span><span class="pencil"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg></span></div>
+          <div class="freveal"><div class="freveal-inner"><span class="rtag r">Course 3</span><br>The dropdown where you'll record your call — Removed Review, Leave Review, or other options. You'll learn every option and when to use each one in Course 3.</div></div>
+        </div>
+      </div>
+
+      <!-- Row 6: Review Link / Approved Reason -->
+      <div class="frow">
+        <div class="fcell left-evidence clickable" onclick="rev(this)">
+          <div class="flbl">Review Link <span class="ftap">Tap</span></div>
+          <div class="fval"><span class="link">https://admin.thumbtack.com/reviews/...</span><span class="pencil"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg></span></div>
+          <div class="freveal"><div class="freveal-inner"><span class="rtag b">Opens in Admin</span><br>A direct link to the review in Admin. Click it to see the actual review text, customer name, pro name, project details, and negotiation history. This is where your investigation starts.</div></div>
+        </div>
+        <div class="fcell right-decision clickable" onclick="rev(this)" style="position:relative" id="ar-cell">
+          <div class="flbl">Approved Reason <span class="ftap">Tap</span></div>
+          <div class="fval"><span>--None--</span><span class="pencil"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg></span></div>
+          <div class="freveal"><div class="freveal-inner"><span class="rtag r">Used when approving removal</span><br>If you approve a review being removed, you select the reason here. Otherwise it stays at --None--.<br><br><strong style="font-size:12px;color:var(--sf-link);cursor:pointer" onclick="event.stopPropagation();toggleDD('ar-dd')">View all Approved Reason options ▾</strong><div class="dd-overlay" id="ar-dd"><div class="dd-item"><span class="check"><svg viewBox="0 0 24 24"><polyline points="5 12 10 17 19 8"/></svg></span> <strong>--None--</strong></div><div class="dd-item"><span class="nocheck"></span> Review bug</div><div class="dd-item"><span class="nocheck"></span> No interaction</div><div class="dd-item"><span class="nocheck"></span> Duplicate update</div><div class="dd-item"><span class="nocheck"></span> Fake reviews</div><div class="dd-item"><span class="nocheck"></span> Personal identifiable info/pictures</div><div class="dd-item"><span class="nocheck"></span> Blacklisted words</div><div class="dd-item"><span class="nocheck"></span> Review/update posted outside reasonable amount of time</div><div class="dd-item"><span class="nocheck"></span> Review intended for TT/Not related</div><div class="dd-item"><span class="nocheck"></span> Request violates user guidelines</div><div class="dd-item"><span class="nocheck"></span> Verifying review</div></div></div></div>
+        </div>
+      </div>
+
+      <!-- Row 7: General Comments / Manager Comments -->
+      <div class="frow tall">
+        <div class="fcell left-evidence clickable" onclick="rev(this)">
+          <div class="flbl">General Comments <span class="ftap">Tap</span></div>
+          <div class="gc-text">Customer has been leaving negative reviews on multiple platforms. Pro completed the work and was paid by the customer. The customer then disputed the charges with their bank. The pro won the chargeback — the bank ruled in the pro's favor. Pro says the review is unfair and wants it removed.</div>
+          <div class="fval" style="margin-top:4px"><span></span><span class="pencil"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg></span></div>
+          <div class="freveal"><div class="freveal-inner"><span class="rtag g">Read this completely</span><br>The frontline rep's summary of the pro's complaint and supporting details. This is where you'll find the pro's full story — chargeback outcomes, claims about fake reviews, what they provided. Read this completely before you look at the review in Admin.</div></div>
+        </div>
+        <div class="fcell right-decision clickable" onclick="rev(this)">
+          <div class="flbl">Manager Comments <span class="ftap">Tap</span></div>
+          <div class="fval"><span style="color:var(--tt-black-300)">(empty)</span><span class="pencil"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg></span></div>
+          <div class="freveal"><div class="freveal-inner"><span class="rtag r">Course 3</span><br>Where you document your reasoning — what you found, what principle applies, and why you made the call. This is what your manager reads in QA reviews. You'll learn how to write a strong Manager Comment in Course 3.</div></div>
+        </div>
+      </div>
+
+      <div class="sysinfo">
+        <div class="sysinfo-title"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg> System Information</div>
+        <div class="sysinfo-grid">
+          <div><label>Created By</label><br><span class="link">Taylor Chen</span>, 5/12/2026 2:15 PM</div>
+          <div><label>Record Type</label><br><span>Customer Support</span></div>
+          <div><label>Last Modified By</label><br><span class="link">Taylor Chen</span>, 5/12/2026 2:15 PM</div>
+          <div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar">
+      <div class="sb-tabs"><div class="sb-tab on">Post</div><div class="sb-tab">Poll</div></div>
+      <div class="sb-area">
+        <div class="sb-compose"><input class="sb-input" placeholder="Share an update..." disabled><button class="sb-share">Share</button></div>
+        <div class="sb-search"><div class="sb-search-ico"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 6 20 18 20 19 8 8 8"/></svg></div><input class="sb-search-input" placeholder="Search this feed..." disabled></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="prog">
+    <span class="prog-text">Fields explored: <strong id="cnt">0</strong> of 10</span>
+    <span class="prog-status" id="stat">Click each field to learn more</span>
+  </div>
+
+</div>
+
+<script>
+  var total=10,found=0,hasClicked=false,nudgeTimer=null;
+  function rev(el){
+    if(el.classList.contains('revealed'))return;
+    el.classList.add('revealed');found++;hasClicked=true;hideNudge();
+    document.getElementById('cnt').textContent=found;
+    if(found===total){document.getElementById('stat').textContent='All fields explored ✓';document.getElementById('stat').style.color='#2DB783';}
+    else{document.getElementById('stat').textContent=found+' of '+total+' explored';}
+  }
+  function toggleDD(id){document.getElementById(id).classList.toggle('show');}
+  document.addEventListener('click',function(e){document.querySelectorAll('.dd-overlay.show').forEach(function(dd){if(!dd.contains(e.target)&&!e.target.textContent.includes('View all')){dd.classList.remove('show');}});});
+  function showNudge(){if(hasClicked)return;document.getElementById('nudge-arrow').classList.add('show');document.getElementById('nudge-tooltip').classList.add('show');}
+  function hideNudge(){document.getElementById('nudge-arrow').classList.remove('show');document.getElementById('nudge-tooltip').classList.remove('show');if(nudgeTimer)clearTimeout(nudgeTimer);}
+  nudgeTimer=setTimeout(showNudge,5000);
+</script>
+</body>
+</html>
