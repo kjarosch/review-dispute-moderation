@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Read the Evidence</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+  :root{
+    --tt-blue:#009FD9;--tt-black:#2F3033;--tt-black-300:#676D73;
+    --tt-gray:#D3D4D5;--tt-gray-300:#E9ECED;--tt-gray-200:#FAFAFA;
+    --tt-white:#FFFFFF;--tt-green:#2DB783;--tt-green-tint:#E8F7F1;
+    --tt-blue-tint:#E5F5FB;--tt-red:#FF5A5F;--tt-red-tint:#FFF0F0;
+    --tt-yellow:#FEBE14;--tt-yellow-tint:#FFFBE6;
+    --sf-blue:#0176D3;--sf-nav:#F3F3F3;--sf-border:#C9C9C9;
+    --sf-link:#0176D3;--sf-orange:#E87722;
+    --admin-border:#DDDDDD;--admin-link:#1155CC;
+    --admin-section:#F8F9FA;--admin-header:#2D3436;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{font-family:'Montserrat',-apple-system,sans-serif;color:var(--tt-black);background:#F4F6F9;font-size:13px;line-height:1.4}
+  .sim{max-width:1200px;margin:0 auto;background:white}
+
+  /* ── Header ── */
+  .hdr{background:var(--tt-black);padding:20px 28px;display:flex;align-items:flex-start;gap:14px}
+  .hdr-ico{width:44px;height:44px;background:var(--tt-blue);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .hdr-ico svg{width:24px;height:24px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .hdr-txt h1{font-size:18px;font-weight:700;color:white;margin-bottom:4px}
+  .hdr-txt p{font-size:13px;color:rgba(255,255,255,0.75);line-height:1.55}
+
+  /* ── Hunt bar (persistent counter + found list) ── */
+  .hunt-bar{background:var(--tt-black);border-bottom:3px solid var(--tt-blue);padding:10px 28px;display:flex;align-items:center;gap:20px;position:sticky;top:0;z-index:50}
+  .hunt-counter{display:flex;align-items:center;gap:10px;flex-shrink:0}
+  .hunt-num{font-size:20px;font-weight:800;color:var(--tt-blue)}
+  .hunt-label{font-size:12px;color:rgba(255,255,255,0.6);line-height:1.3}
+  .hunt-label strong{color:white;display:block;font-size:13px}
+  .hunt-divider{width:1px;background:rgba(255,255,255,0.15);align-self:stretch}
+  .found-list{display:flex;flex-wrap:wrap;gap:6px;flex:1}
+  .found-item{background:var(--tt-green);color:white;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;display:flex;align-items:center;gap:5px;animation:popIn 0.3s ease}
+  .found-item svg{width:11px;height:11px;stroke:white;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+  @keyframes popIn{from{opacity:0;transform:scale(0.7)}to{opacity:1;transform:scale(1)}}
+  .found-slot{background:rgba(255,255,255,0.08);border:1.5px dashed rgba(255,255,255,0.2);border-radius:20px;width:90px;height:26px}
+
+  /* ── Step tabs ── */
+  .steps{background:var(--tt-gray-200);border-bottom:1px solid var(--tt-gray-300);padding:0 28px;display:flex}
+  .step-tab{padding:10px 20px;font-size:12px;font-weight:600;color:var(--tt-black-300);border-bottom:3px solid transparent;margin-bottom:-1px;display:flex;align-items:center;gap:7px;white-space:nowrap}
+  .step-tab.active{color:var(--tt-blue);border-bottom-color:var(--tt-blue)}
+  .step-tab.done{color:var(--tt-green);border-bottom-color:var(--tt-green)}
+  .step-num{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;background:var(--tt-gray-300);color:var(--tt-black-300)}
+  .step-tab.active .step-num{background:var(--tt-blue);color:white}
+  .step-tab.done .step-num{background:var(--tt-green);color:white}
+
+  .screen{display:none}.screen.active{display:block}
+
+  /* ── Instruction bar ── */
+  .inst-bar{background:var(--tt-blue-tint);border-bottom:2px solid var(--tt-blue);padding:12px 24px;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:var(--tt-black)}
+  .inst-bar svg{width:18px;height:18px;stroke:var(--tt-blue);fill:none;stroke-width:2;flex-shrink:0;stroke-linecap:round;stroke-linejoin:round}
+
+  /* ── SF chrome ── */
+  .sf-rechdr{background:white;padding:12px 20px;border-bottom:1px solid var(--sf-border);display:flex;align-items:center;justify-content:space-between}
+  .sf-rechdr-l{display:flex;align-items:center;gap:12px}
+  .sf-ico{width:36px;height:36px;background:var(--sf-orange);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .sf-ico svg{width:20px;height:20px;stroke:white;fill:none;stroke-width:2}
+  .sf-info .ty{font-size:11px;color:var(--tt-black-300)}.sf-info .ti{font-size:16px;font-weight:700}
+  .sf-acts{display:flex;gap:6px}
+  .sf-sbtn{padding:6px 12px;border:1px solid var(--sf-border);border-radius:4px;background:white;font-size:11px;cursor:default;color:var(--tt-black);font-family:inherit}
+  .sf-meta{background:white;padding:6px 20px 10px;border-bottom:1px solid var(--sf-border);display:flex;gap:32px}
+  .sf-mf label{display:block;font-size:10px;color:var(--tt-black-300);text-transform:uppercase;letter-spacing:0.5px}.sf-mf span{font-size:12px;font-weight:500}
+  .sf-tabs{display:flex;padding:0 20px;background:white;border-bottom:1px solid var(--sf-border)}
+  .sf-tab{padding:10px 16px;font-size:13px;color:var(--tt-black-300);font-weight:500;border-bottom:3px solid transparent;margin-bottom:-1px;cursor:default}
+  .sf-tab.on{color:var(--sf-link);border-bottom-color:var(--sf-link);font-weight:600}
+
+  /* ── Clickable fields ── */
+  .sp-fields{background:white}
+  .frow{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--tt-gray-300)}
+  .fcell{padding:11px 16px;cursor:pointer;transition:background 0.15s;position:relative}
+  .fcell:first-child{border-right:1px solid var(--tt-gray-300)}
+  .fcell.static{cursor:default}
+  .fcell:not(.static):not(.clicked):hover{background:rgba(0,159,217,0.04)}
+  .fcell.clicked{cursor:default}
+  .fcell.clicked.evidence{background:var(--tt-green-tint)}
+  .fcell.clicked.noise{background:var(--tt-gray-200)}
+  .flbl{font-size:10px;color:var(--tt-black-300);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px}
+  .fval{font-size:13px;color:var(--tt-black);font-weight:500}
+  .fval.lnk{color:var(--sf-link)}
+  .fval.dim{color:var(--tt-black-300);opacity:0.45}
+  .fval.dd{background:var(--sf-nav);border:1px solid var(--sf-border);border-radius:4px;padding:5px 9px}
+  .fval.ta{background:var(--sf-nav);border:1px solid var(--sf-border);border-radius:4px;padding:9px 10px;min-height:58px;line-height:1.5}
+  .fval.ta.dim{opacity:0.4}
+
+  /* ── Field reveal ── */
+  .freveal{display:none;margin-top:8px;padding:9px 11px;border-radius:7px;font-size:12px;line-height:1.55}
+  .fcell.clicked .freveal{display:block}
+  .fcell.evidence .freveal{background:white;border:1.5px solid var(--tt-green);color:var(--tt-black)}
+  .fcell.noise .freveal{background:white;border:1.5px solid var(--tt-gray);color:var(--tt-black-300)}
+  .rtag{display:inline-block;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:2px 7px;border-radius:3px;margin-bottom:4px}
+  .rtag.ev{background:var(--tt-green-tint);color:var(--tt-green)}
+  .rtag.no{background:var(--tt-gray-300);color:var(--tt-black-300)}
+
+  /* ── Admin rows ── */
+  .admin-wrap{background:var(--tt-gray-200)}
+  .admin-top{background:var(--admin-header);padding:8px 20px;display:flex;align-items:center;gap:12px}
+  .admin-logo{font-size:13px;font-weight:700;color:white;letter-spacing:0.5px}
+  .admin-body{padding:16px 20px}
+  .admin-body h2{font-size:14px;font-weight:700;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--admin-border)}
+  .admin-layout{display:grid;grid-template-columns:1fr 240px;gap:16px}
+  .acard{background:white;border:1px solid var(--admin-border);border-radius:4px;margin-bottom:12px;overflow:hidden}
+  .acard-hdr{background:var(--admin-section);padding:8px 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--admin-border)}
+  .arow{display:grid;grid-template-columns:160px 1fr;border-bottom:1px solid var(--tt-gray-300);cursor:pointer;transition:background 0.15s}
+  .arow:last-child{border-bottom:none}
+  .arow.static{cursor:default}
+  .arow:not(.static):not(.clicked):hover{background:rgba(0,159,217,0.04)}
+  .arow.clicked{cursor:default}
+  .arow.clicked.evidence{background:var(--tt-green-tint)}
+  .arow.clicked.noise{background:var(--tt-gray-200)}
+  .arow-lbl{padding:9px 14px;font-size:11px;color:var(--tt-black-300);font-weight:500;background:var(--admin-section);border-right:1px solid var(--tt-gray-300)}
+  .arow-val{padding:9px 14px;font-size:13px;color:var(--tt-black)}
+  .arow-val .lnk{color:var(--admin-link);text-decoration:underline}
+  .arow-reveal{display:none;grid-column:1/-1;padding:9px 14px;font-size:12px;line-height:1.55;border-top:1px solid var(--tt-gray-300)}
+  .arow.clicked .arow-reveal{display:block}
+  .arow.evidence .arow-reveal{background:white;border-top-color:var(--tt-green);color:var(--tt-black)}
+  .arow.noise .arow-reveal{background:white;border-top-color:var(--tt-gray);color:var(--tt-black-300)}
+  .review-text{background:#FFFDE7;border-left:4px solid #F9A825;padding:10px 12px;border-radius:0 4px 4px 0;font-size:13px;line-height:1.6;font-style:italic}
+  .star-full{color:#F4B942}.star-empty{color:#DDD}
+  .actions-panel{background:white;border:1px solid var(--admin-border);border-radius:4px;overflow:hidden;align-self:start}
+  .actions-hdr{background:var(--admin-section);padding:8px 12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--admin-border)}
+  .action-item{padding:7px 12px;font-size:12px;color:var(--admin-link);border-bottom:1px solid var(--tt-gray-300);cursor:default;text-decoration:underline}
+  .action-item:last-child{border-bottom:none}
+
+  /* ── Done bar ── */
+  .done-bar{background:white;border-top:1px solid var(--tt-gray-300);padding:14px 24px;display:flex;align-items:center;gap:12px}
+  .done-msg{flex:1;font-size:12px;color:var(--tt-black-300);line-height:1.4}
+  .back-btn{padding:9px 18px;border:1.5px solid var(--tt-gray-300);border-radius:6px;background:white;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;color:var(--tt-black);white-space:nowrap;transition:all 0.15s}
+  .back-btn:hover{border-color:var(--tt-black);background:var(--tt-gray-200)}
+  .fwd-btn{padding:9px 20px;background:var(--tt-blue);color:white;border:none;border-radius:6px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all 0.15s}
+  .fwd-btn:hover{background:#0089C2}
+
+  /* ── Linked Users screen ── */
+  .lu-screen{padding:32px 40px;max-width:900px;background:white;min-height:300px}
+  .lu-admin-bar{background:var(--admin-header);padding:8px 20px;display:flex;align-items:center}
+  .lu-logo{font-size:13px;font-weight:700;color:white;letter-spacing:0.5px}
+  .lu-user-info{font-size:12px;color:rgba(255,255,255,0.5);margin-left:auto}
+  .lu-title{font-size:24px;font-weight:700;margin-bottom:12px}
+  .lu-name{font-size:15px;color:var(--admin-link);margin-bottom:16px;text-decoration:underline}
+  .lu-empty{font-size:14px;color:var(--tt-black-300);margin-bottom:20px}
+  .lu-result-row{cursor:pointer;padding:14px 12px;border:1px solid var(--tt-gray-300);border-radius:6px;transition:all 0.15s;margin-bottom:8px}
+  .lu-result-row:not(.clicked):hover{background:rgba(0,159,217,0.04);border-color:var(--tt-blue)}
+  .lu-result-row.clicked{cursor:default}
+  .lu-result-row.clicked.evidence{background:var(--tt-green-tint);border-color:var(--tt-green)}
+  .lu-result-row.clicked.noise{background:var(--tt-gray-200);border-color:var(--tt-gray)}
+  .lu-result-label{font-size:11px;font-weight:600;color:var(--tt-black-300);margin-bottom:3px}
+  .lu-result-val{font-size:14px;color:var(--tt-black);font-weight:500}
+  .lu-result-hint{font-size:11px;color:var(--tt-black-300);margin-top:4px}
+  .lu-reveal{display:none;margin-top:8px;padding:9px 11px;border-radius:6px;font-size:12px;line-height:1.55}
+  .lu-result-row.clicked .lu-reveal{display:block}
+  .lu-result-row.evidence .lu-reveal{background:white;border:1.5px solid var(--tt-green);color:var(--tt-black)}
+  .lu-result-row.noise .lu-reveal{background:white;border:1.5px solid var(--tt-gray);color:var(--tt-black-300)}
+
+  /* ── Customer overlay ── */
+  .cx-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:white;z-index:150;overflow-y:auto}
+  .cx-overlay.show{display:block}
+  .cx-top{background:var(--admin-header);padding:8px 20px;display:flex;align-items:center}
+  .cx-logo{font-size:13px;font-weight:700;color:white}
+  .cx-back{padding:5px 14px;background:var(--tt-blue);color:white;border:none;border-radius:4px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;margin-left:auto;display:flex;align-items:center;gap:6px}
+  .cx-back svg{width:12px;height:12px;stroke:white;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+  .cx-hdr{background:white;padding:16px 24px;border-bottom:1px solid var(--admin-border);display:flex;align-items:flex-start}
+  .cx-avatar{width:60px;height:60px;border-radius:50%;background:var(--tt-gray-300);display:flex;align-items:center;justify-content:center;margin-right:16px;flex-shrink:0}
+  .cx-avatar svg{width:32px;height:32px;stroke:var(--tt-black-300);fill:none;stroke-width:1.5}
+  .cx-name{font-size:20px;font-weight:700;margin-bottom:4px}
+  .cx-ids{display:flex;gap:8px;margin-bottom:6px}
+  .cx-id-pill{background:var(--tt-gray-200);border:1px solid var(--admin-border);border-radius:4px;padding:3px 8px;font-size:11px;font-weight:600;color:var(--tt-black-300)}
+  .cx-badges{display:flex;gap:6px}
+  .cx-badge{font-size:11px;font-weight:600;padding:3px 8px;border-radius:4px}
+  .cx-badge.enabled{background:#E8F5E9;color:#2E7D32}
+  .cx-badge.customer{background:#E3F2FD;color:#1565C0}
+  .cx-body{display:grid;grid-template-columns:1fr 260px}
+  .cx-details{border-right:1px solid var(--admin-border)}
+  .cx-section-hdr{background:white;padding:10px 20px;border-bottom:1px solid var(--admin-border);font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px}
+  .cx-section-hdr svg{width:14px;height:14px;stroke:var(--tt-black-300);fill:none;stroke-width:2}
+  .cx-drow{display:grid;grid-template-columns:200px 1fr;border-bottom:1px solid var(--tt-gray-300)}
+  .cx-dlbl{padding:9px 20px;font-size:13px;font-weight:500}
+  .cx-dval{padding:9px 16px;font-size:13px}
+  .cx-pill{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;background:#E8F5E9;color:#2E7D32}
+  .cx-actions{background:white}
+  .ua-hdr{background:var(--admin-section);padding:8px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--admin-border);border-top:1px solid var(--admin-border);display:flex;align-items:center;gap:5px}
+  .ua-hdr:first-child{border-top:none}
+  .ua-hdr svg{width:12px;height:12px;stroke:var(--tt-black-300);fill:none;stroke-width:2}
+  .ua-item{padding:7px 16px;font-size:12px;border-bottom:1px solid var(--tt-gray-300)}
+  .ua-item.lnk{color:var(--admin-link);text-decoration:underline;cursor:default}
+  .ua-item.muted{color:var(--tt-black-300);cursor:default}
+  .ua-item.target{color:var(--tt-blue);font-weight:600;text-decoration:underline;background:var(--tt-blue-tint);cursor:pointer}
+  .ua-item.target:hover{background:#D4EDF8}
+
+  /* ── Debrief ── */
+  .debrief{padding:28px;background:var(--tt-gray-200);min-height:500px}
+  .debrief-hdr{margin-bottom:24px}
+  .debrief-hdr h2{font-size:22px;font-weight:700;margin-bottom:6px}
+  .debrief-hdr p{font-size:14px;color:var(--tt-black-300);line-height:1.5}
+  .score-card{background:white;border-radius:12px;padding:20px 24px;margin-bottom:24px;display:flex;align-items:center;gap:20px;border:2px solid var(--tt-gray-300)}
+  .score-circle{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;flex-shrink:0;font-weight:800}
+  .score-circle .num{font-size:24px;line-height:1}
+  .score-circle .den{font-size:11px;font-weight:600;opacity:0.7}
+  .score-circle.great{background:var(--tt-green-tint);color:var(--tt-green);border:3px solid var(--tt-green)}
+  .score-circle.ok{background:var(--tt-yellow-tint);color:#B8860B;border:3px solid var(--tt-yellow)}
+  .score-circle.low{background:var(--tt-red-tint);color:var(--tt-red);border:3px solid var(--tt-red)}
+  .score-text h3{font-size:16px;font-weight:700;margin-bottom:4px}
+  .score-text p{font-size:13px;color:var(--tt-black-300);line-height:1.5}
+  .ev-list{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
+  .ev-item{background:white;border-radius:8px;padding:14px 18px;display:flex;align-items:flex-start;gap:14px;border:1.5px solid var(--tt-gray-300)}
+  .ev-item.caught{border-color:var(--tt-green)}
+  .ev-item.missed{border-color:var(--tt-red)}
+  .ev-ico{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .ev-ico svg{width:16px;height:16px;stroke:white;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+  .ev-item.caught .ev-ico{background:var(--tt-green)}
+  .ev-item.missed .ev-ico{background:var(--tt-red)}
+  .ev-field{font-size:13px;font-weight:700;margin-bottom:3px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .ev-src{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:2px 6px;border-radius:3px;background:var(--tt-gray-200);color:var(--tt-black-300)}
+  .ev-status{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px}
+  .ev-item.caught .ev-status{color:var(--tt-green)}
+  .ev-item.missed .ev-status{color:var(--tt-red)}
+  .ev-why{font-size:13px;color:var(--tt-black);line-height:1.55}
+  .debrief-cta{background:var(--tt-green-tint);border:1.5px solid var(--tt-green);border-radius:10px;padding:16px 20px;font-size:14px;line-height:1.6;color:var(--tt-black)}
+  .debrief-cta strong{color:var(--tt-green)}
+</style>
+</head>
+<body>
+<div class="sim">
+
+  <div class="hdr">
+    <div class="hdr-ico"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+    <div class="hdr-txt">
+      <h1>Read the Evidence</h1>
+      <p>Marcus's case is open. There are <strong style="color:white">7 pieces of evidence</strong> hidden across the Support Process, the Admin review thread, and the customer's profile. Click any field — you'll find out immediately whether it's one of them.</p>
+    </div>
+  </div>
+
+  <!-- Persistent hunt bar -->
+  <div class="hunt-bar">
+    <div class="hunt-counter">
+      <div class="hunt-num" id="hunt-num">0</div>
+      <div class="hunt-label"><strong>of 7 found</strong>Keep reading</div>
+    </div>
+    <div class="hunt-divider"></div>
+    <div class="found-list" id="found-list">
+      <!-- Filled dynamically -->
+    </div>
+  </div>
+
+  <div class="steps">
+    <div class="step-tab active" id="tab-1"><span class="step-num" id="sn1">1</span> Support Process</div>
+    <div class="step-tab" id="tab-2"><span class="step-num" id="sn2">2</span> Admin Review Thread</div>
+    <div class="step-tab" id="tab-3"><span class="step-num" id="sn3">3</span> Linked Users</div>
+    <div class="step-tab" id="tab-4"><span class="step-num" id="sn4">4</span> Debrief</div>
+  </div>
+
+  <!-- ══════ SCREEN 1: SUPPORT PROCESS ══════ -->
+  <div class="screen active" id="sc1">
+    <div class="inst-bar">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Read the Support Process and click any field you think is relevant to this dispute.
+    </div>
+
+    <div class="sf-rechdr">
+      <div class="sf-rechdr-l">
+        <div class="sf-ico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg></div>
+        <div class="sf-info"><div class="ty">Support Process</div><div class="ti">Review Dispute for Case 14082615</div></div>
+      </div>
+      <div class="sf-acts"><div class="sf-sbtn">+ Follow</div><div class="sf-sbtn">Edit</div><div class="sf-sbtn">New Note</div><div class="sf-sbtn">Clone</div></div>
+    </div>
+    <div class="sf-meta">
+      <div class="sf-mf"><label>Status</label><span>New</span></div>
+      <div class="sf-mf"><label>Created Date/Time</label><span>5/12/2026 2:15 PM</span></div>
+      <div class="sf-mf"><label>Date/Time Closed</label><span></span></div>
+      <div class="sf-mf"><label>Assignee</label><span></span></div>
+    </div>
+    <div class="sf-tabs"><div class="sf-tab on">Details</div><div class="sf-tab">Files</div><div class="sf-tab">History</div></div>
+
+    <div class="sp-fields">
+      <div class="frow">
+        <div class="fcell" onclick="tap(this,'sp-rn','noise')">
+          <div class="flbl">Record Name</div>
+          <div class="fval">Review Dispute for Case 14082615</div>
+          <div class="freveal"><span class="rtag no">Not evidence</span><br>Auto-populates to confirm which case this belongs to. Nothing to evaluate here.</div>
+        </div>
+        <div class="fcell static"><div class="flbl">Status</div><div class="fval">New</div></div>
+      </div>
+      <div class="frow">
+        <div class="fcell" onclick="tap(this,'sp-case','noise')">
+          <div class="flbl">Case</div>
+          <div class="fval lnk">14082615</div>
+          <div class="freveal"><span class="rtag no">Not evidence</span><br>A navigation link back to the parent case. Not a piece of evidence for evaluating the dispute.</div>
+        </div>
+        <div class="fcell static"><div class="flbl">Escalated Date</div><div class="fval">5/12/2026 2:15 PM</div></div>
+      </div>
+      <div class="frow">
+        <div class="fcell" onclick="tap(this,'sp-owner','noise')">
+          <div class="flbl">Case Owner Name</div>
+          <div class="fval">Proactive MI Queue</div>
+          <div class="freveal"><span class="rtag no">Not evidence</span><br>Confirms the case is in your queue — relevant for routing, not for evaluating the dispute.</div>
+        </div>
+        <div class="fcell static"><div class="flbl">Reviewed by Date</div><div class="fval dim">—</div></div>
+      </div>
+      <div class="frow">
+        <div class="fcell static"></div>
+        <div class="fcell static"><div class="flbl">Reviewed By</div><div class="fval dim">—</div></div>
+      </div>
+      <div class="frow">
+        <div class="fcell" onclick="tap(this,'dr','evidence','Dispute Reason')">
+          <div class="flbl">Dispute Reason</div>
+          <div class="fval dd">Fake reviews</div>
+          <div class="freveal"><span class="rtag ev">Evidence found</span><br><strong>Dispute Reason</strong> — "Fake reviews" is the claim you're evaluating. Everything you investigate in Admin is asking: does this review actually show signs of being fake?</div>
+        </div>
+        <div class="fcell" onclick="tap(this,'sp-mgr','noise')">
+          <div class="flbl">Manager Decision</div>
+          <div class="fval dd dim">Awaiting Decision</div>
+          <div class="freveal"><span class="rtag no">Not evidence</span><br>Where you'll record your call in Course 3. Empty for now.</div>
+        </div>
+      </div>
+      <div class="frow">
+        <div class="fcell" onclick="tap(this,'rl','evidence','Review Link')">
+          <div class="flbl">Review Link</div>
+          <div class="fval lnk">https://admin.thumbtack.com/reviews/...</div>
+          <div class="freveal"><span class="rtag ev">Evidence found</span><br><strong>Review Link</strong> — the gateway to your investigation. Click "Continue to Admin" to open the review thread, see the review text, the project, and the negotiation history.</div>
+        </div>
+        <div class="fcell" onclick="tap(this,'sp-ar','noise')">
+          <div class="flbl">Approved Reason</div>
+          <div class="fval dd dim">--None--</div>
+          <div class="freveal"><span class="rtag no">Not evidence</span><br>You'll fill this in if you approve a removal. Empty because no decision has been made yet.</div>
+        </div>
+      </div>
+      <div class="frow">
+        <div class="fcell" onclick="tap(this,'gc','evidence','General Comments')">
+          <div class="flbl">General Comments</div>
+          <div class="fval ta">Customer has been leaving negative reviews on multiple platforms. Pro completed the work and was paid by the customer. The customer then disputed the charges with their bank. The pro won the chargeback — the bank ruled in the pro's favor. Pro says the review is unfair and wants it removed.</div>
+          <div class="freveal"><span class="rtag ev">Evidence found</span><br><strong>General Comments</strong> — the pro won the chargeback and the customer left reviews on multiple platforms. Read this before you open Admin so you have the pro's story in your head first.</div>
+        </div>
+        <div class="fcell" onclick="tap(this,'sp-mc','noise')">
+          <div class="flbl">Manager Comments</div>
+          <div class="fval ta dim"></div>
+          <div class="freveal"><span class="rtag no">Not evidence</span><br>You'll write your reasoning here in Course 3 after you make your decision.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="done-bar">
+      <span class="done-msg">Click any field you think matters, then move to the Admin review thread.</span>
+      <button class="fwd-btn" onclick="go(2)">Continue to Admin →</button>
+    </div>
+  </div>
+
+  <!-- ══════ SCREEN 2: ADMIN REVIEW THREAD ══════ -->
+  <div class="screen" id="sc2">
+    <div class="inst-bar">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      You're in Admin. Keep reading — click anything you think is relevant to this dispute.
+    </div>
+    <div class="admin-wrap">
+      <div class="admin-top"><span class="admin-logo">Thumbtack Admin</span></div>
+      <div class="admin-body">
+        <h2>Review #55328764799502XXXX</h2>
+        <div class="admin-layout">
+          <div>
+            <div class="acard">
+              <div class="acard-hdr">Summary</div>
+              <div class="arow static"><div class="arow-lbl">Rating</div><div class="arow-val"><span class="star-full">★</span><span class="star-empty">★</span><span class="star-empty">★</span><span class="star-empty">★</span><span class="star-empty">★</span>&nbsp;(1 star)</div></div>
+              <div class="arow" onclick="openCx()"><div class="arow-lbl">Customer</div><div class="arow-val"><span class="lnk" style="font-weight:600">Janelle Rivera ↗</span></div><div class="arow-reveal"></div></div>
+              <div class="arow" onclick="tapArow(this,'admin-pro','noise')">
+                <div class="arow-lbl">Professional</div><div class="arow-val"><span class="lnk">Marcus Thompson</span></div>
+                <div class="arow-reveal"><span class="rtag no">Not evidence</span><br>Links to the pro's user page. Useful for account checks, but not direct evidence for evaluating whether this review is fake.</div>
+              </div>
+              <div class="arow" onclick="tapArow(this,'admin-biz','noise')">
+                <div class="arow-lbl">Business</div><div class="arow-val">THOMPSON HANDYMAN SERVICES</div>
+                <div class="arow-reveal"><span class="rtag no">Not evidence</span><br>The business name. Contextual background, not a piece of evidence you'd cite in your decision.</div>
+              </div>
+              <div class="arow" onclick="tapArow(this,'proj','evidence','Project')">
+                <div class="arow-lbl">Project</div><div class="arow-val">Handyman — Cabinet Installation</div>
+                <div class="arow-reveal"><span class="rtag ev">Evidence found</span><br><strong>Project</strong> — the job type matches the review content. A complaint about a loose cabinet on a cabinet installation job is consistent with a real experience, not a fake review.</div>
+              </div>
+              <div class="arow" onclick="tapArow(this,'neg','evidence','Negotiation')">
+                <div class="arow-lbl">Negotiation</div><div class="arow-val"><span class="lnk">View quote and back-and-forth</span></div>
+                <div class="arow-reveal"><span class="rtag ev">Evidence found</span><br><strong>Negotiation</strong> — confirms a real financial transaction happened. A customer's project was sent to the pro and accepted by the pro. That confirms a real project was requested on Thumbtack — strong evidence against the "fake review" claim.</div>
+              </div>
+            </div>
+            <div class="acard">
+              <div class="acard-hdr">Revision History</div>
+              <div class="arow" onclick="tapArow(this,'txt','evidence','Review Text')">
+                <div class="arow-lbl">Text</div>
+                <div class="arow-val"><div class="review-text">"Work was rushed. He showed up late and the cabinet's already loose. Wouldn't recommend."</div></div>
+                <div class="arow-reveal"><span class="rtag ev">Evidence found</span><br><strong>Review Text</strong> — the actual review. It describes a specific workmanship complaint about a real job. That's the opposite of what a fake review looks like.</div>
+              </div>
+              <div class="arow static"><div class="arow-lbl">Created Time</div><div class="arow-val">May 8, 2026, 10:22 AM</div></div>
+              <div class="arow" onclick="tapArow(this,'ip','noise')">
+                <div class="arow-lbl">Customer IP</div><div class="arow-val"><span class="lnk">192.168.XX.XX</span></div>
+                <div class="arow-reveal"><span class="rtag no">Not evidence (yet)</span><br>IP investigation is a Course 5 skill. Relevant for fake-review patterns, but you don't have the tools to evaluate it yet. Note it exists and move on.</div>
+              </div>
+              <div class="arow" onclick="tapArow(this,'chars','noise')">
+                <div class="arow-lbl">Characteristics</div><div class="arow-val">WORK_QUALITY</div>
+                <div class="arow-reveal"><span class="rtag no">Not evidence</span><br>A tag the customer selected when leaving the review. Consistent with the review text, but not something you'd cite as evidence in your decision.</div>
+              </div>
+              <div class="arow static"><div class="arow-lbl">Photos</div><div class="arow-val" style="color:var(--tt-black-300)">(none)</div></div>
+            </div>
+            <div style="padding:8px 0;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+              <button class="fwd-btn" onclick="openCx()" style="background:var(--tt-black)">Go to Janelle's user page →</button>
+              <span style="font-size:12px;color:var(--tt-black-300)">Check Linked Users under Trust &amp; Safety</span>
+            </div>
+          </div>
+          <div>
+            <div class="actions-panel">
+              <div class="actions-hdr">Actions</div>
+              <div class="action-item">Edit Review</div>
+              <div class="action-item">Delete Review Text</div>
+              <div class="action-item">Delete Review</div>
+              <div class="action-item">Associate with Different Customer</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="done-bar">
+      <button class="back-btn" onclick="go(1)">← Support Process</button>
+      <span class="done-msg">Click anything relevant, then go to Janelle's user page to check Linked Users.</span>
+      <button class="fwd-btn" onclick="go(3)">I've checked Linked Users →</button>
+    </div>
+  </div>
+
+  <!-- ══════ SCREEN 3: LINKED USERS ══════ -->
+  <div class="screen" id="sc3">
+    <div class="lu-admin-bar"><span class="lu-logo">Thumbtack Admin</span><span class="lu-user-info">Kendl Jarosch (kjarosch)</span></div>
+    <div class="lu-screen">
+      <h2 class="lu-title">Linked Users</h2>
+      <div class="lu-name">Janelle Rivera</div>
+      <div class="lu-empty">No linked accounts found.</div>
+      <div class="lu-result-row" onclick="tapLU(this)">
+        <div class="lu-result-label">Result</div>
+        <div class="lu-result-val">No linked accounts found.</div>
+        <div class="lu-result-hint">Click if you think this result is relevant to the dispute.</div>
+        <div class="lu-reveal"></div>
+      </div>
+    </div>
+    <div class="done-bar">
+      <button class="back-btn" onclick="go(2)">← Admin Review Thread</button>
+      <span class="done-msg">Click the result if it's relevant, then see your debrief.</span>
+      <button class="fwd-btn" onclick="showDebrief()">See my debrief →</button>
+    </div>
+  </div>
+
+  <!-- ══════ SCREEN 4: DEBRIEF ══════ -->
+  <div class="screen" id="sc4">
+    <div class="debrief">
+      <div class="debrief-hdr">
+        <h2>Here's what you found — and what you missed.</h2>
+        <p>7 pieces of evidence in Marcus's case. Here's how you read it.</p>
+      </div>
+      <div class="score-card" id="score-card"></div>
+      <div class="ev-list" id="ev-list"></div>
+      <div class="debrief-cta">
+        <strong>The bottom line on Marcus's case:</strong> The review criticizes workmanship — rushed work, late arrival, a loose cabinet. That's a negative review, not a fake one. The Negotiation confirms a real transaction, General Comments confirms the chargeback ruling, and Linked Users comes back clean. <strong>None of this adds up to a policy violation. The review stays.</strong> You'll make that call officially in Course 3.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Customer profile overlay -->
+<div class="cx-overlay" id="cx-overlay">
+  <div class="cx-top">
+    <span class="cx-logo">Thumbtack Admin</span>
+    <button class="cx-back" onclick="closeCx()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg> Back to Review Thread</button>
+  </div>
+  <div class="cx-hdr">
+    <div class="cx-avatar"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+    <div>
+      <div class="cx-name">Janelle Rivera</div>
+      <div class="cx-ids"><span class="cx-id-pill">PK 549161589668XXXXXX</span><span class="cx-id-pill">ID [DEPRECATED] 7478XXXX</span></div>
+      <div class="cx-badges"><span class="cx-badge enabled">Enabled</span><span class="cx-badge customer">Customer</span></div>
+    </div>
+  </div>
+  <div class="cx-body">
+    <div class="cx-details">
+      <div class="cx-section-hdr"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg> Details</div>
+      <div class="cx-drow"><div class="cx-dlbl">Email</div><div class="cx-dval">j.rivera.sample@email.com</div></div>
+      <div class="cx-drow"><div class="cx-dlbl">Time zone</div><div class="cx-dval">Pacific Time Zone</div></div>
+      <div class="cx-drow"><div class="cx-dlbl">Signed up</div><div class="cx-dval">8 months ago • Apr 3, 2026, 9:14 AM</div></div>
+      <div class="cx-drow"><div class="cx-dlbl">Identity status</div><div class="cx-dval"><span style="background:var(--tt-gray-200);color:var(--tt-black-300);padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600">Unknown</span></div></div>
+      <div class="cx-drow"><div class="cx-dlbl">Customer Account hold flags</div><div class="cx-dval"><span class="cx-pill">No holds applied</span></div></div>
+      <div class="cx-drow"><div class="cx-dlbl">Banned status</div><div class="cx-dval"><span class="cx-pill">Not blocklisted</span></div></div>
+    </div>
+    <div class="cx-actions">
+      <div style="padding:8px 16px;font-size:13px;font-weight:600;border-bottom:1px solid var(--admin-border)">Actions</div>
+      <div class="ua-hdr"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Basic</div>
+      <div class="ua-item lnk">Create New User</div>
+      <div class="ua-item muted">Edit User</div>
+      <div class="ua-item muted">Reset password</div>
+      <div class="ua-hdr" style="border-top:2px solid var(--tt-blue);background:var(--tt-blue-tint);color:var(--tt-blue)"><svg viewBox="0 0 24 24" style="stroke:var(--tt-blue)"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Trust &amp; Safety</div>
+      <div class="ua-item lnk">Background Check</div>
+      <div class="ua-item lnk">View Blocklist Record</div>
+      <div class="ua-item target" onclick="goToLU()">Show Linked Users</div>
+      <div class="ua-item lnk">Show Verification Data</div>
+      <div class="ua-item lnk">Override User Link</div>
+      <div class="ua-item lnk">LADS Portal</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var found = {};
+  var TOTAL = 7;
+
+  var EVIDENCE_META = {
+    dr:   { name:'Dispute Reason',   source:'Support Process' },
+    rl:   { name:'Review Link',      source:'Support Process' },
+    gc:   { name:'General Comments', source:'Support Process' },
+    txt:  { name:'Review Text',      source:'Admin — Revision History' },
+    proj: { name:'Project',          source:'Admin — Summary' },
+    neg:  { name:'Negotiation',      source:'Admin — Summary' },
+    lu:   { name:'Linked Users',     source:'Customer Profile' }
+  };
+
+  var EVIDENCE_WHY = {
+    dr:   'The claim you\'re evaluating. "Fake reviews" tells you exactly what you need to investigate — does this review actually show signs of being fake?',
+    rl:   'The gateway to your investigation. You need this to reach the review text, the project, and the negotiation — the core of your evidence.',
+    gc:   'The pro won the chargeback and the customer left reviews on multiple platforms. This context matters before you open Admin — you need the pro\'s story first.',
+    txt:  'Your most important field. The review describes a specific workmanship complaint about a specific job. That\'s the opposite of what a fake review looks like.',
+    proj: 'The job type matches the review content exactly. A complaint about a loose cabinet on a cabinet installation job is consistent with a real experience.',
+    neg:  'A quote was sent and accepted — a real financial transaction between Marcus and Janelle. Strong evidence against the "fake review" claim.',
+    lu:   'A clean result is still a result. No linked accounts means no signs of competitor abuse or a manufactured customer profile. Janelle\'s account is legitimate.'
+  };
+
+  function updateHuntBar() {
+    var count = Object.keys(found).length;
+    document.getElementById('hunt-num').textContent = count;
+
+    var label = document.querySelector('.hunt-label');
+    if (count === TOTAL) {
+      label.innerHTML = '<strong style="color:#2DB783">of 7 found</strong>All found!';
+    } else {
+      label.innerHTML = '<strong>of 7 found</strong>Keep reading';
+    }
+
+    // Rebuild found list
+    var list = document.getElementById('found-list');
+    var html = '';
+    Object.keys(found).forEach(function(k) {
+      var m = EVIDENCE_META[k];
+      html += '<div class="found-item"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>' + m.name + '</div>';
+    });
+    // Add empty slots for unfound items
+    var remaining = TOTAL - Object.keys(found).length;
+    for (var i = 0; i < remaining; i++) {
+      html += '<div class="found-slot"></div>';
+    }
+    list.innerHTML = html;
+  }
+
+  function tap(el, id, type, name) {
+    if (el.classList.contains('clicked')) return;
+    el.classList.add('clicked', type);
+    if (type === 'evidence') {
+      found[id] = true;
+      updateHuntBar();
+    }
+  }
+
+  function tapArow(el, id, type, name) {
+    if (el.classList.contains('clicked')) return;
+    el.classList.add('clicked', type);
+    if (type === 'evidence') {
+      found[id] = true;
+      updateHuntBar();
+    }
+  }
+
+  function tapLU(el) {
+    if (el.classList.contains('clicked')) return;
+    el.classList.add('clicked', 'evidence');
+    found['lu'] = true;
+    el.querySelector('.lu-reveal').innerHTML =
+      '<span class="rtag ev">Evidence found</span><br><strong>Linked Users</strong> — a clean result is still a result. No linked accounts means no signs of competitor abuse or a fake customer profile. Janelle\'s account is legitimate.';
+    updateHuntBar();
+  }
+
+  function go(n) {
+    for (var i = 1; i <= 4; i++) {
+      document.getElementById('sc' + i).classList.remove('active');
+      document.getElementById('tab-' + i).classList.remove('active', 'done');
+    }
+    document.getElementById('sc' + n).classList.add('active');
+    document.getElementById('tab-' + n).classList.add('active');
+    for (var j = 1; j < n; j++) document.getElementById('tab-' + j).classList.add('done');
+    window.scrollTo(0, 0);
+  }
+
+  function openCx() {
+    document.getElementById('cx-overlay').classList.add('show');
+    window.scrollTo(0, 0);
+  }
+
+  function closeCx() {
+    document.getElementById('cx-overlay').classList.remove('show');
+  }
+
+  function goToLU() {
+    document.getElementById('cx-overlay').classList.remove('show');
+    go(3);
+  }
+
+  function showDebrief() {
+    go(4);
+    renderDebrief();
+  }
+
+  function renderDebrief() {
+    var keys = Object.keys(EVIDENCE_META);
+    var caught = keys.filter(function(k) { return found[k]; });
+    var missed = keys.filter(function(k) { return !found[k]; });
+    var n = caught.length;
+
+    var cls = n >= 6 ? 'great' : n >= 4 ? 'ok' : 'low';
+    var title = n === TOTAL ? 'All 7 found' : n + ' of 7 found';
+    var msg = n === TOTAL
+      ? 'You found everything. You read the full picture before drawing any conclusions.'
+      : n >= 5
+      ? 'Strong read. You caught most of the evidence — see what slipped through below.'
+      : n >= 3
+      ? 'You got the basics. A few key pieces were left unread — they\'re worth understanding.'
+      : 'Several important pieces were missed. That\'s what practice is for — read through the full list below.';
+
+    document.getElementById('score-card').innerHTML =
+      '<div class="score-circle ' + cls + '"><span class="num">' + n + '</span><span class="den">of ' + TOTAL + '</span></div>' +
+      '<div class="score-text"><h3>' + title + '</h3><p>' + msg + '</p></div>';
+
+    var html = '';
+    // Caught first
+    caught.forEach(function(k) {
+      var m = EVIDENCE_META[k];
+      html += '<div class="ev-item caught">';
+      html += '<div class="ev-ico"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>';
+      html += '<div><div class="ev-field">' + m.name + ' <span class="ev-src">' + m.source + '</span> <span class="ev-status">✓ Found</span></div>';
+      html += '<div class="ev-why">' + EVIDENCE_WHY[k] + '</div></div></div>';
+    });
+    // Missed
+    missed.forEach(function(k) {
+      var m = EVIDENCE_META[k];
+      html += '<div class="ev-item missed">';
+      html += '<div class="ev-ico"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>';
+      html += '<div><div class="ev-field">' + m.name + ' <span class="ev-src">' + m.source + '</span> <span class="ev-status">✗ Missed</span></div>';
+      html += '<div class="ev-why"><strong>You missed this.</strong> ' + EVIDENCE_WHY[k] + '</div></div></div>';
+    });
+    document.getElementById('ev-list').innerHTML = html;
+  }
+
+  // Initialize the hunt bar
+  updateHuntBar();
+</script>
+</body>
+</html>
