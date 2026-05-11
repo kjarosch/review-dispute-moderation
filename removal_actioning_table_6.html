@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Removal & Actioning Table</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+  :root{
+    --tt-blue:#009FD9;--tt-black:#2F3033;--tt-black-300:#676D73;
+    --tt-gray:#D3D4D5;--tt-gray-300:#E9ECED;--tt-gray-200:#FAFAFA;
+    --tt-white:#FFFFFF;--tt-green:#2DB783;--tt-green-tint:#E8F7F1;
+    --tt-blue-tint:#E5F5FB;--tt-red:#FF5A5F;--tt-red-tint:#FFF0F0;
+    --tt-yellow:#FEBE14;--tt-yellow-tint:#FFFBE6;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{font-family:'Montserrat',-apple-system,sans-serif;color:var(--tt-black);background:#F4F6F9;font-size:13px;line-height:1.4}
+  .sim{max-width:1200px;margin:0 auto;background:white}
+
+  /* Header */
+  .hdr{background:var(--tt-black);padding:20px 28px;display:flex;align-items:flex-start;gap:14px}
+  .hdr-ico{width:44px;height:44px;background:var(--tt-blue);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .hdr-ico svg{width:24px;height:24px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .hdr-txt h1{font-size:18px;font-weight:700;color:white;margin-bottom:4px}
+  .hdr-txt p{font-size:13px;color:rgba(255,255,255,0.7);line-height:1.55}
+
+  /* ══════ LEARN MODE ══════ */
+  .learn-wrap{padding:24px 28px}
+  .learn-inst{background:var(--tt-blue-tint);border-left:4px solid var(--tt-blue);border-radius:0 8px 8px 0;padding:12px 18px;margin-bottom:24px;font-size:13px;font-weight:600;color:var(--tt-black);display:flex;align-items:center;gap:10px}
+  .learn-inst svg{width:18px;height:18px;stroke:var(--tt-blue);fill:none;stroke-width:2;flex-shrink:0;stroke-linecap:round;stroke-linejoin:round}
+
+  /* Row cards in learn mode */
+  .learn-row{background:white;border:1.5px solid var(--tt-gray-300);border-radius:12px;margin-bottom:12px;overflow:hidden;transition:all 0.2s;cursor:pointer}
+  .learn-row:hover:not(.revealed){border-color:var(--tt-blue);box-shadow:0 2px 8px rgba(0,159,217,0.08)}
+  .learn-row.revealed{cursor:default;border-color:var(--tt-green)}
+  .learn-row.no-violation{border-color:var(--tt-gray-300)}
+  .learn-row.no-violation.revealed{border-color:var(--tt-yellow)}
+
+  .row-header{padding:14px 18px;display:flex;align-items:center;gap:12px}
+  .row-num{width:28px;height:28px;border-radius:50%;background:var(--tt-gray-200);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--tt-black-300);flex-shrink:0;transition:all 0.2s}
+  .learn-row.revealed .row-num{background:var(--tt-green);color:white}
+  .learn-row.no-violation.revealed .row-num{background:var(--tt-yellow);color:var(--tt-black)}
+  .row-violation{font-size:14px;font-weight:600;color:var(--tt-black);flex:1;line-height:1.4}
+  .row-tap{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--tt-black-300);background:var(--tt-gray-200);padding:4px 10px;border-radius:4px;flex-shrink:0;border:1px solid var(--tt-gray-300)}
+  .learn-row.revealed .row-tap{display:none}
+
+  /* Edge case badge */
+  .edge-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:3px 8px;border-radius:4px;background:var(--tt-yellow-tint);color:#B8860B;border:1px solid var(--tt-yellow);margin-left:8px;flex-shrink:0}
+  .edge-badge svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+
+  /* Row content (revealed) */
+  .row-content{display:none;border-top:1px solid var(--tt-gray-300);padding:16px 18px}
+  .learn-row.revealed .row-content{display:block}
+
+  .row-desc{font-size:13px;color:var(--tt-black);line-height:1.6;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--tt-gray-300)}
+
+  .action-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+
+  .action-cell{background:var(--tt-gray-200);border-radius:8px;padding:12px 14px}
+  .action-cell.full{grid-column:1/-1}
+  .action-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--tt-black-300);margin-bottom:5px}
+  .action-value{font-size:13px;color:var(--tt-black);line-height:1.5;font-weight:500}
+
+  .action-cell.admin-action .action-value{color:var(--tt-red);font-weight:700}
+  .action-cell.manager-decision .action-value{color:var(--tt-green);font-weight:700}
+
+  .edge-callout{background:var(--tt-yellow-tint);border:1.5px solid var(--tt-yellow);border-radius:8px;padding:12px 14px;margin-top:12px;display:flex;align-items:flex-start;gap:10px;font-size:12px;line-height:1.5}
+  .edge-callout svg{width:16px;height:16px;stroke:#B8860B;fill:none;stroke-width:2;flex-shrink:0;margin-top:1px;stroke-linecap:round;stroke-linejoin:round}
+  .edge-callout strong{color:#B8860B}
+
+  /* Learn nav */
+  .learn-nav{display:flex;align-items:center;justify-content:space-between;margin-top:16px;padding-top:16px;border-top:1px solid var(--tt-gray-300)}
+  .learn-count{font-size:13px;color:var(--tt-black-300)}
+  .learn-count strong{color:var(--tt-black)}
+  .collapse-btn{padding:7px 16px;border:1.5px solid var(--tt-gray-300);border-radius:6px;background:white;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;color:var(--tt-black-300);transition:all 0.15s}
+  .collapse-btn:hover{border-color:var(--tt-black-300);color:var(--tt-black)}
+</style>
+</head>
+<body>
+<div class="sim">
+
+  <div class="hdr">
+    <div class="hdr-ico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="9" x2="9" y2="21"/></svg></div>
+    <div class="hdr-txt">
+      <h1>The Removal & Actioning Table</h1>
+      <p>Your decision tool. Every removal in this queue traces back to a row in this table. Click each row to learn the full violation description and the exact actions to take.</p>
+    </div>
+  </div>
+
+  <!-- ══════ LEARN MODE ══════ -->
+  <div id="view-learn">
+    <div class="learn-wrap">
+      <div class="learn-inst">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Click each row to see the full violation description and the exact actions to take. You'll use this table in the exercise that follows — and the KA is your reference during live work.
+      </div>
+
+      <!-- Row 1: No Interaction -->
+      <div class="learn-row" onclick="reveal(this,1)" id="lr1">
+        <div class="row-header">
+          <div class="row-num">1</div>
+          <div class="row-violation">No interaction between pro and customer</div>
+          <span class="row-tap">Tap to learn</span>
+        </div>
+        <div class="row-content">
+          <div class="row-desc">The review is not based on an actual or attempted interaction between the pro and customer — no contact, communication, or engagement of any kind.</div>
+          <div class="action-grid">
+            <div class="action-cell admin-action"><div class="action-label">Admin Action</div><div class="action-value">Delete Review</div></div>
+            <div class="action-cell manager-decision"><div class="action-label">Manager Decision</div><div class="action-value">Removed Review</div></div>
+            <div class="action-cell"><div class="action-label">Salesforce Internal Note</div><div class="action-value">Review Dispute - Removed (No Interaction)</div></div>
+            <div class="action-cell full"><div class="action-label">Manager Comment</div><div class="action-value">The review has been removed because the customer and pro did not have a confirmed interaction, which violates our Content and Review Policy.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 2: Time limit -->
+      <div class="learn-row" onclick="reveal(this,2)" id="lr2">
+        <div class="row-header">
+          <div class="row-num">2</div>
+          <div class="row-violation">Review posted outside the allowable time limit<span class="edge-badge"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Edge case</span></div>
+          <span class="row-tap">Tap to learn</span>
+        </div>
+        <div class="row-content">
+          <div class="row-desc">The review was posted more than 6 months after the last interaction, or more than 1 year after the final day of the project.</div>
+          <div class="action-grid">
+            <div class="action-cell admin-action"><div class="action-label">Admin Action</div><div class="action-value">Delete Review</div></div>
+            <div class="action-cell manager-decision"><div class="action-label">Manager Decision</div><div class="action-value">Removed Review</div></div>
+            <div class="action-cell"><div class="action-label">Salesforce Internal Note</div><div class="action-value">Review Dispute - Removed (exceeded allowable time limit)</div></div>
+            <div class="action-cell full"><div class="action-label">Manager Comment</div><div class="action-value">The review has been removed as it was posted outside of the allowable time limit set by our Content and Review Policy.</div></div>
+          </div>
+          <div class="edge-callout"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><div><strong>Edge case:</strong> Long-lead projects (e.g., attorneys, home builds) require proof of work before applying this row. If the pro can demonstrate the project was ongoing, the time limit may not apply.</div></div>
+        </div>
+      </div>
+
+      <!-- Row 3: Gibberish -->
+      <div class="learn-row" onclick="reveal(this,3)" id="lr3">
+        <div class="row-header">
+          <div class="row-num">3</div>
+          <div class="row-violation">Gibberish, single punctuation mark, or unreadable content</div>
+          <span class="row-tap">Tap to learn</span>
+        </div>
+        <div class="row-content">
+          <div class="row-desc">The review is gibberish, a single punctuation mark, or something of the sort — content that has no meaningful relationship to a service experience.</div>
+          <div class="action-grid">
+            <div class="action-cell admin-action"><div class="action-label">Admin Action</div><div class="action-value">Delete Review</div></div>
+            <div class="action-cell manager-decision"><div class="action-label">Manager Decision</div><div class="action-value">Removed Review</div></div>
+            <div class="action-cell"><div class="action-label">Salesforce Internal Note</div><div class="action-value">Review Dispute - Removed (Unrelated Content)</div></div>
+            <div class="action-cell full"><div class="action-label">Manager Comment</div><div class="action-value">The review has been removed as the content was unrelated to the service experience and violated our Content Policy.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 4: Unrelated content -->
+      <div class="learn-row" onclick="reveal(this,4)" id="lr4">
+        <div class="row-header">
+          <div class="row-num">4</div>
+          <div class="row-violation">Review content unrelated to the pro's conduct or job experience</div>
+          <span class="row-tap">Tap to learn</span>
+        </div>
+        <div class="row-content">
+          <div class="row-desc">The review content is unrelated to the pro's conduct, professionalism, or job experience — for example, political commentary or content about a third party.</div>
+          <div class="action-grid">
+            <div class="action-cell admin-action"><div class="action-label">Admin Action</div><div class="action-value">Delete Review</div></div>
+            <div class="action-cell manager-decision"><div class="action-label">Manager Decision</div><div class="action-value">Removed Review</div></div>
+            <div class="action-cell"><div class="action-label">Salesforce Internal Note</div><div class="action-value">Review Dispute - Removed (Unrelated Content)</div></div>
+            <div class="action-cell full"><div class="action-label">Manager Comment</div><div class="action-value">The review has been removed as the content was unrelated to the service experience and violated our Content Policy.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 5: Wrong pro -->
+      <div class="learn-row" onclick="reveal(this,5)" id="lr5">
+        <div class="row-header">
+          <div class="row-num">5</div>
+          <div class="row-violation">Review intended for a different pro</div>
+          <span class="row-tap">Tap to learn</span>
+        </div>
+        <div class="row-content">
+          <div class="row-desc">The review text or case details strongly indicate the review was intended for a different pro.</div>
+          <div class="action-grid">
+            <div class="action-cell admin-action"><div class="action-label">Admin Action</div><div class="action-value">Delete Review</div></div>
+            <div class="action-cell manager-decision"><div class="action-label">Manager Decision</div><div class="action-value">Removed Review</div></div>
+            <div class="action-cell"><div class="action-label">Salesforce Internal Note</div><div class="action-value">Review Dispute - Removed (Wrong Pro)</div></div>
+            <div class="action-cell full"><div class="action-label">Manager Comment</div><div class="action-value">The review has been removed as it was found to be intended for a different professional.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 6: Duplicate -->
+      <div class="learn-row" onclick="reveal(this,6)" id="lr6">
+        <div class="row-header">
+          <div class="row-num">6</div>
+          <div class="row-violation">Exact duplicate review by the same customer</div>
+          <span class="row-tap">Tap to learn</span>
+        </div>
+        <div class="row-content">
+          <div class="row-desc">The review text is an exact duplicate of another review for the pro by the same customer — including reviews imported from another platform.</div>
+          <div class="action-grid">
+            <div class="action-cell admin-action"><div class="action-label">Admin Action</div><div class="action-value">Delete the latest duplicate review (or verified TT review)</div></div>
+            <div class="action-cell manager-decision"><div class="action-label">Manager Decision</div><div class="action-value">Removed Review</div></div>
+            <div class="action-cell"><div class="action-label">Salesforce Internal Note</div><div class="action-value">Review Dispute - Removed (Duplicate)</div></div>
+            <div class="action-cell full"><div class="action-label">Manager Comment</div><div class="action-value">The newer review has been removed as it was a duplicate of a previously submitted review.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 7: PII in text -->
+      <div class="learn-row" onclick="reveal(this,7)" id="lr7">
+        <div class="row-header">
+          <div class="row-num">7</div>
+          <div class="row-violation">Review text contains PII<span class="edge-badge"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Edge case</span></div>
+          <span class="row-tap">Tap to learn</span>
+        </div>
+        <div class="row-content">
+          <div class="row-desc">The review text contains PII — full names, email addresses, phone numbers, URLs, or social media handles.</div>
+          <div class="action-grid">
+            <div class="action-cell admin-action"><div class="action-label">Admin Action</div><div class="action-value">Delete Review</div></div>
+            <div class="action-cell manager-decision"><div class="action-label">Manager Decision</div><div class="action-value">Removed Review</div></div>
+            <div class="action-cell"><div class="action-label">Salesforce Internal Note</div><div class="action-value">Review Dispute - Removed (PII present)</div></div>
+            <div class="action-cell full"><div class="action-label">Manager Comment</div><div class="action-value">The review has been removed as it violates privacy standards (PII).</div></div>
+          </div>
+          <div class="edge-callout"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><div><strong>Exception:</strong> The pro's first and last name is permitted if visible on their profile. This is the only PII exception. Everything else — email, phone, URL, social handle — removes.</div></div>
+        </div>
+      </div>
+
+      <!-- Row 8: PII in images -->
+      <div class="learn-row" onclick="reveal(this,8)" id="lr8">
+        <div class="row-header">
+          <div class="row-num">8</div>
+          <div class="row-violation">Review images contain PII or unauthorized content</div>
+          <span class="row-tap">Tap to learn</span>
+        </div>
+        <div class="row-content">
+          <div class="row-desc">The review contains images displaying PII or unauthorized content — photos of individuals (including minors), billing statements, or private documents of the pro or customer.</div>
+          <div class="action-grid">
+            <div class="action-cell admin-action"><div class="action-label">Admin Action</div><div class="action-value">Delete Review</div></div>
+            <div class="action-cell manager-decision"><div class="action-label">Manager Decision</div><div class="action-value">Removed Review</div></div>
+            <div class="action-cell"><div class="action-label">Salesforce Internal Note</div><div class="action-value">Review Dispute - Removed (PII present or Minor Individual)</div></div>
+            <div class="action-cell full"><div class="action-label">Manager Comment</div><div class="action-value">The review has been removed as it violates privacy standards (PII).</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 9: Commercial promotion -->
+      <div class="learn-row" onclick="reveal(this,9)" id="lr9">
+        <div class="row-header">
+          <div class="row-num">9</div>
+          <div class="row-violation">Review promotes another business or service</div>
+          <span class="row-tap">Tap to learn</span>
+        </div>
+        <div class="row-content">
+          <div class="row-desc">Content that promotes another business or service is included in the review — for example: "I went with Company X instead" or "Check out my new website..."</div>
+          <div class="action-grid">
+            <div class="action-cell admin-action"><div class="action-label">Admin Action</div><div class="action-value">Delete Review</div></div>
+            <div class="action-cell manager-decision"><div class="action-label">Manager Decision</div><div class="action-value">Removed Review</div></div>
+            <div class="action-cell"><div class="action-label">Salesforce Internal Note</div><div class="action-value">Review Dispute - Removed (Commercial Promotion)</div></div>
+            <div class="action-cell full"><div class="action-label">Manager Comment</div><div class="action-value">The review has been removed because it violated our policy regarding commercial promotion.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 10: 24-hour exception -->
+      <div class="learn-row" onclick="reveal(this,10)" id="lr10">
+        <div class="row-header">
+          <div class="row-num">10</div>
+          <div class="row-violation">24-hour exception — typo, redundant text, or mismatched rating<span class="edge-badge"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Narrow exception</span></div>
+          <span class="row-tap">Tap to learn</span>
+        </div>
+        <div class="row-content">
+          <div class="row-desc">Pro or customer requested removal within 24 hours due to a typo, redundant text, misleading Thumbtack email, or mismatched rating. <strong>The review will only be removed if an identical duplicate exists</strong> — the duplicate is what gets deleted, not the original substantive review.</div>
+          <div class="action-grid">
+            <div class="action-cell admin-action"><div class="action-label">Admin Action</div><div class="action-value">Delete Review</div></div>
+            <div class="action-cell manager-decision"><div class="action-label">Manager Decision</div><div class="action-value">Removed Review</div></div>
+            <div class="action-cell"><div class="action-label">Salesforce Internal Note</div><div class="action-value">Review Dispute - Removed (24hr Exception)</div></div>
+            <div class="action-cell full"><div class="action-label">Manager Comment</div><div class="action-value">The review has been removed as a courtesy regarding the error duplicate due to [INSERT REASON].</div></div>
+          </div>
+          <div class="edge-callout"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><div><strong>This is a narrow service courtesy only.</strong> It is NOT a general policy and NOT a loophole for removing substantive reviews. The identical duplicate must exist. Without it, this row does not apply — even if the request is within 24 hours.</div></div>
+        </div>
+      </div>
+
+      <!-- Row 11: Fake/AI images -->
+      <div class="learn-row" onclick="reveal(this,11)" id="lr11">
+        <div class="row-header">
+          <div class="row-num">11</div>
+          <div class="row-violation">Review contains suspiciously fake or AI-generated images</div>
+          <span class="row-tap">Tap to learn</span>
+        </div>
+        <div class="row-content">
+          <div class="row-desc">The review contains images that are suspiciously fake or AI-generated — misleading content that violates the Content and Review Policy. See Course 5 for the full investigation flow.</div>
+          <div class="action-grid">
+            <div class="action-cell admin-action"><div class="action-label">Admin Action</div><div class="action-value">Delete Review</div></div>
+            <div class="action-cell manager-decision"><div class="action-label">Manager Decision</div><div class="action-value">Removed Review</div></div>
+            <div class="action-cell"><div class="action-label">Salesforce Internal Note</div><div class="action-value">Review Dispute - Removed (Misleading/Fake content via AI)</div></div>
+            <div class="action-cell full"><div class="action-label">Manager Comment</div><div class="action-value">The review has been removed for containing fake or AI-generated images which is misleading and violating our Content and Review Policy.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- No-violation row -->
+      <div class="learn-row no-violation" onclick="reveal(this,12)" id="lr12">
+        <div class="row-header">
+          <div class="row-num" style="background:var(--tt-yellow-tint);color:#B8860B">—</div>
+          <div class="row-violation" style="color:var(--tt-black)">No violation — Leave Review #CBB</div>
+          <span class="row-tap">Tap to learn</span>
+        </div>
+        <div class="row-content">
+          <div class="row-desc">The review does not meet any of the ten violation categories. The review stays on the platform regardless of how sympathetic the pro's situation is.</div>
+          <div class="action-grid">
+            <div class="action-cell admin-action" style="background:var(--tt-green-tint)"><div class="action-label">Admin Action</div><div class="action-value" style="color:var(--tt-green)">No action in Admin</div></div>
+            <div class="action-cell manager-decision" style="background:var(--tt-green-tint)"><div class="action-label">Manager Decision</div><div class="action-value" style="color:var(--tt-green)">Leave Review #CBB</div></div>
+            <div class="action-cell" style="background:var(--tt-yellow-tint)"><div class="action-label">Salesforce Internal Note</div><div class="action-value">N/A — no removal</div></div>
+            <div class="action-cell full" style="background:var(--tt-green-tint)"><div class="action-label">Manager Comment (standard language)</div><div class="action-value">An interaction has taken place, along with the pro admitting that work was done for the customer. There is nothing in violation for content or our TOU, so the review will stay. We should coach the pro on responding to this customer.</div></div>
+          </div>
+          <div class="edge-callout" style="background:var(--tt-green-tint);border-color:var(--tt-green)">
+            <svg viewBox="0 0 24 24" style="stroke:var(--tt-green)"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <div><strong style="color:var(--tt-green)">Hold the line.</strong> If the review doesn't meet a violation category, it stays — regardless of the pro's situation.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="learn-nav">
+        <span class="learn-count">Rows reviewed: <strong id="learn-count">0</strong> of 11 (+ no-violation)</span>
+        <button class="collapse-btn" onclick="collapseAll()">Collapse all</button>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+
+<script>
+  var reviewed = {};
+
+  function reveal(el, id){
+    if(el.classList.contains('revealed')) return;
+    el.classList.add('revealed');
+    reviewed[id] = true;
+    updateProgress();
+  }
+
+  function updateProgress(){
+    var n = Object.keys(reviewed).length;
+    document.getElementById('learn-count').textContent = n < 12 ? n : '11 (+1)';
+    var badge = document.getElementById('progress-badge');
+    var display = n >= 12 ? '11 of 11 reviewed ✓' : n + ' of 11 reviewed';
+    badge.textContent = display;
+    if(n >= 12){ badge.style.background='#2DB783'; badge.style.color='white'; }
+  }
+
+  function collapseAll(){
+    document.querySelectorAll('.learn-row.revealed').forEach(function(r){
+      r.classList.remove('revealed');
+    });
+    reviewed = {};
+    updateProgress();
+  }
+
+</script>
+</body>
+</html>
