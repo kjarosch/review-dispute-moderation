@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Full Case Decision Simulation</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+  :root{
+    --tt-blue:#009FD9;--tt-black:#2F3033;--tt-black-300:#676D73;
+    --tt-gray:#D3D4D5;--tt-gray-300:#E9ECED;--tt-gray-200:#FAFAFA;
+    --tt-white:#FFFFFF;--tt-green:#2DB783;--tt-green-tint:#E8F7F1;
+    --tt-blue-tint:#E5F5FB;--tt-red:#FF5A5F;--tt-red-tint:#FFF0F0;
+    --tt-yellow:#FEBE14;--tt-yellow-tint:#FFFBE6;
+    --sf-blue:#0176D3;--sf-nav:#F3F3F3;--sf-border:#C9C9C9;
+    --sf-link:#0176D3;--sf-orange:#E87722;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{font-family:'Montserrat',-apple-system,sans-serif;color:var(--tt-black);background:#F4F6F9;font-size:13px;line-height:1.4}
+  .sim{max-width:1200px;margin:0 auto;background:white}
+
+  /* Header */
+  .hdr{background:var(--tt-black);padding:20px 28px;display:flex;align-items:flex-start;gap:14px}
+  .hdr-ico{width:44px;height:44px;background:var(--tt-blue);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .hdr-ico svg{width:24px;height:24px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .hdr-txt h1{font-size:18px;font-weight:700;color:white;margin-bottom:4px}
+  .hdr-txt p{font-size:13px;color:rgba(255,255,255,0.75);line-height:1.55}
+
+  /* Progress bar */
+  .pbar{background:var(--tt-black);padding:10px 28px;display:flex;align-items:center;gap:16px;border-top:1px solid rgba(255,255,255,0.1)}
+  .pbar-label{font-size:12px;font-weight:600;color:rgba(255,255,255,0.6);white-space:nowrap}
+  .pbar-steps{display:flex;gap:6px;flex:1}
+  .pbar-step{height:6px;border-radius:3px;flex:1;background:rgba(255,255,255,0.15);transition:background 0.3s}
+  .pbar-step.active{background:var(--tt-blue)}
+  .pbar-step.done{background:var(--tt-green)}
+
+  /* Screens */
+  .screen{display:none}.screen.active{display:block}
+
+  /* SF chrome */
+  .sf-rechdr{background:white;padding:12px 20px;border-bottom:1px solid var(--sf-border);display:flex;align-items:center;justify-content:space-between}
+  .sf-rechdr-l{display:flex;align-items:center;gap:12px}
+  .sf-ico{width:36px;height:36px;background:var(--sf-orange);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .sf-ico svg{width:20px;height:20px;stroke:white;fill:none;stroke-width:2}
+  .sf-info .ty{font-size:11px;color:var(--tt-black-300)}.sf-info .ti{font-size:16px;font-weight:700}
+  .sf-acts{display:flex;gap:6px}
+  .sf-btn{padding:6px 12px;border:1px solid var(--sf-border);border-radius:4px;background:white;font-size:11px;cursor:default;color:var(--tt-black);font-family:inherit}
+  .sf-meta{background:white;padding:6px 20px 10px;border-bottom:1px solid var(--sf-border);display:flex;gap:32px}
+  .sf-mf label{display:block;font-size:10px;color:var(--tt-black-300);text-transform:uppercase;letter-spacing:0.5px}.sf-mf span{font-size:12px;font-weight:500}
+  .sf-tabs{display:flex;padding:0 20px;background:white;border-bottom:1px solid var(--sf-border)}
+  .sf-tab{padding:10px 16px;font-size:13px;color:var(--tt-black-300);font-weight:500;border-bottom:3px solid transparent;margin-bottom:-1px;cursor:default}
+  .sf-tab.on{color:var(--sf-link);border-bottom-color:var(--sf-link);font-weight:600}
+
+  /* SP fields */
+  .sp-fields{background:white}
+  .frow{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--tt-gray-300)}
+  .fcell{padding:11px 16px;border-right:1px solid var(--tt-gray-300)}
+  .fcell:last-child{border-right:none}
+  .flbl{font-size:10px;color:var(--tt-black-300);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px}
+  .fval{font-size:13px;color:var(--tt-black);font-weight:500}
+  .fval.lnk{color:var(--sf-link)}
+  .fval.dim{color:var(--tt-black-300);opacity:0.45}
+  .fval.dd{background:var(--sf-nav);border:1px solid var(--sf-border);border-radius:4px;padding:5px 9px}
+  .fval.ta{background:var(--sf-nav);border:1px solid var(--sf-border);border-radius:4px;padding:9px 10px;min-height:72px;line-height:1.5}
+  .fval.ta.dim{opacity:0.4}
+  .pencil{display:inline-block;opacity:0.3;margin-left:4px}
+  .pencil svg{width:12px;height:12px;stroke:var(--tt-black-300);fill:none;stroke-width:2}
+
+  /* Admin */
+  .admin-wrap{background:var(--tt-gray-200)}
+  .admin-top{background:#2D3436;padding:8px 20px;display:flex;align-items:center;gap:12px}
+  .admin-logo{font-size:13px;font-weight:700;color:white;letter-spacing:0.5px}
+  .admin-body{padding:16px 20px}
+  .admin-body h2{font-size:14px;font-weight:700;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #DDDDDD}
+  .admin-layout{display:grid;grid-template-columns:1fr 220px;gap:16px}
+  .acard{background:white;border:1px solid #DDDDDD;border-radius:4px;margin-bottom:12px;overflow:hidden}
+  .acard-hdr{background:#F8F9FA;padding:8px 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid #DDDDDD}
+  .arow{display:grid;grid-template-columns:160px 1fr;border-bottom:1px solid var(--tt-gray-300)}
+  .arow:last-child{border-bottom:none}
+  .arow-lbl{padding:9px 14px;font-size:11px;color:var(--tt-black-300);font-weight:500;background:#F8F9FA;border-right:1px solid var(--tt-gray-300)}
+  .arow-val{padding:9px 14px;font-size:13px;color:var(--tt-black)}
+  .arow-val .lnk{color:#1155CC;text-decoration:underline}
+  .review-text{background:#FFFDE7;border-left:4px solid #F9A825;padding:10px 12px;border-radius:0 4px 4px 0;font-size:13px;line-height:1.6;font-style:italic}
+  .highlight{background:#FFF3CD;font-weight:700;color:#856404;padding:1px 3px;border-radius:2px}
+  .star-full{color:#F4B942}.star-empty{color:#DDD}
+  .admin-actions{background:white;border:1px solid #DDDDDD;border-radius:4px;overflow:hidden;align-self:start}
+  .admin-acts-hdr{background:#F8F9FA;padding:8px 12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid #DDDDDD}
+  .admin-act-item{padding:7px 12px;font-size:12px;color:#1155CC;border-bottom:1px solid var(--tt-gray-300);cursor:default;text-decoration:underline}
+  .admin-act-item:last-child{border-bottom:none}
+
+  /* Instruction bar */
+  .inst-bar{padding:14px 24px;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:var(--tt-black)}
+  .inst-bar.info{background:var(--tt-blue-tint);border-bottom:2px solid var(--tt-blue)}
+  .inst-bar.warn{background:var(--tt-yellow-tint);border-bottom:2px solid var(--tt-yellow)}
+  .inst-bar svg{width:18px;height:18px;fill:none;stroke-width:2;flex-shrink:0;stroke-linecap:round;stroke-linejoin:round}
+  .inst-bar.info svg{stroke:var(--tt-blue)}
+  .inst-bar.warn svg{stroke:#B8860B}
+
+  /* Decision panel */
+  .decision-panel{background:white;border-top:2px solid var(--tt-blue);padding:20px 24px}
+  .decision-panel h3{font-size:15px;font-weight:700;margin-bottom:16px}
+
+  /* Choice buttons */
+  .choices{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+  .choice{padding:12px 16px;border:1.5px solid var(--tt-gray-300);border-radius:8px;background:white;font-family:inherit;font-size:13px;color:var(--tt-black);cursor:pointer;text-align:left;transition:all 0.15s;line-height:1.4}
+  .choice:hover:not(:disabled){border-color:var(--tt-blue);background:var(--tt-blue-tint)}
+  .choice.correct{border-color:var(--tt-green);background:var(--tt-green-tint);cursor:default}
+  .choice.incorrect{border-color:var(--tt-red);background:var(--tt-red-tint);cursor:default;opacity:0.7}
+  .choice.dimmed{opacity:0.4;cursor:default;pointer-events:none}
+  .choice:disabled{cursor:default}
+
+  /* Feedback */
+  .feedback{display:none;padding:12px 16px;border-radius:8px;font-size:13px;line-height:1.55;margin-bottom:12px}
+  .feedback.show{display:block}
+  .feedback.correct{background:var(--tt-green-tint);border:1.5px solid var(--tt-green)}
+  .feedback.incorrect{background:var(--tt-red-tint);border:1.5px solid var(--tt-red)}
+  .feedback-icon{display:inline-flex;align-items:center;gap:6px;font-weight:700;margin-bottom:4px}
+  .feedback.correct .feedback-icon{color:var(--tt-green)}
+  .feedback.incorrect .feedback-icon{color:var(--tt-red)}
+
+  /* Continue button */
+  .cont-btn{display:none;padding:10px 24px;background:var(--tt-blue);color:white;border:none;border-radius:6px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s}
+  .cont-btn.show{display:inline-block}
+  .cont-btn:hover{background:#0089C2}
+
+  /* Manager comment textarea */
+  .mc-area{width:100%;border:1.5px solid var(--tt-gray-300);border-radius:8px;padding:12px 14px;font-family:inherit;font-size:13px;line-height:1.6;min-height:120px;resize:vertical;color:var(--tt-black);transition:border-color 0.15s}
+  .mc-area:focus{outline:none;border-color:var(--tt-blue)}
+  .mc-submit{margin-top:10px;padding:10px 24px;background:var(--tt-blue);color:white;border:none;border-radius:6px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s}
+  .mc-submit:hover{background:#0089C2}
+  .mc-helper{font-size:12px;color:var(--tt-black-300);margin-bottom:12px;line-height:1.5}
+
+  /* Model answer comparison */
+  .model-wrap{display:none;margin-top:16px}
+  .model-wrap.show{display:block}
+  .model-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+  .model-col{border-radius:8px;padding:14px 16px}
+  .model-col.yours{background:var(--tt-gray-200);border:1.5px solid var(--tt-gray-300)}
+  .model-col.model{background:var(--tt-green-tint);border:1.5px solid var(--tt-green)}
+  .model-col-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px}
+  .model-col.yours .model-col-label{color:var(--tt-black-300)}
+  .model-col.model .model-col-label{color:var(--tt-green)}
+  .model-col-text{font-size:13px;line-height:1.6;color:var(--tt-black)}
+
+  /* Criteria check */
+  .criteria{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+  .criterion{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-radius:6px;font-size:12px;line-height:1.5}
+  .criterion.pass{background:var(--tt-green-tint)}
+  .criterion.fail{background:var(--tt-red-tint)}
+  .crit-ico{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+  .criterion.pass .crit-ico{background:var(--tt-green)}
+  .criterion.fail .crit-ico{background:var(--tt-red)}
+  .crit-ico svg{width:10px;height:10px;stroke:white;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+
+  /* Debrief / Completion */
+  .debrief{padding:28px;background:var(--tt-gray-200)}
+  .debrief-score{background:white;border-radius:12px;padding:20px 24px;margin-bottom:20px;display:flex;align-items:center;gap:20px;border:2px solid var(--tt-green)}
+  .score-ico{width:56px;height:56px;border-radius:50%;background:var(--tt-green-tint);border:3px solid var(--tt-green);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .score-ico svg{width:28px;height:28px;stroke:var(--tt-green);fill:none;stroke-width:2.5}
+  .score-text h2{font-size:18px;font-weight:700;margin-bottom:4px}
+  .score-text p{font-size:13px;color:var(--tt-black-300);line-height:1.5}
+  .decision-summary{background:white;border-radius:12px;padding:20px 24px;margin-bottom:20px}
+  .decision-summary h3{font-size:14px;font-weight:700;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--tt-gray-300)}
+  .ds-row{display:grid;grid-template-columns:180px 1fr;gap:8px;padding:8px 0;border-bottom:1px solid var(--tt-gray-300);font-size:13px}
+  .ds-row:last-child{border-bottom:none}
+  .ds-label{color:var(--tt-black-300);font-weight:500}
+  .ds-val{color:var(--tt-black);font-weight:500}
+  .ds-val.correct{color:var(--tt-green)}
+  .replay-btn{padding:10px 24px;background:var(--tt-black);color:white;border:none;border-radius:6px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;margin-top:4px}
+  .replay-btn:hover{background:#444}
+</style>
+</head>
+<body>
+<div class="sim">
+
+  <div class="hdr">
+    <div class="hdr-ico"><svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
+    <div class="hdr-txt">
+      <h1>Full Case Decision Simulation</h1>
+      <p>Work through a complete disputed review case. Identify the violation, apply the correct actions, and write the Manager Comment. You'll get feedback along the way.</p>
+    </div>
+  </div>
+
+  <div class="pbar">
+    <span class="pbar-label">Step <span id="step-label">1</span> of 5</span>
+    <div class="pbar-steps">
+      <div class="pbar-step active" id="ps1"></div>
+      <div class="pbar-step" id="ps2"></div>
+      <div class="pbar-step" id="ps3"></div>
+      <div class="pbar-step" id="ps4"></div>
+      <div class="pbar-step" id="ps5"></div>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN 1: READ THE SUPPORT PROCESS ══ -->
+  <div class="screen active" id="sc1">
+    <div class="inst-bar info">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Step 1 of 5 — Read the Support Process. When you're ready, open the Review Link to investigate in Admin.
+    </div>
+
+    <div class="sf-rechdr">
+      <div class="sf-rechdr-l">
+        <div class="sf-ico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg></div>
+        <div class="sf-info"><div class="ty">Support Process</div><div class="ti">Review Dispute for Case 14091247</div></div>
+      </div>
+      <div class="sf-acts"><div class="sf-btn">+ Follow</div><div class="sf-btn">Edit</div><div class="sf-btn">New Note</div><div class="sf-btn">Clone</div></div>
+    </div>
+    <div class="sf-meta">
+      <div class="sf-mf"><label>Status</label><span>New</span></div>
+      <div class="sf-mf"><label>Created Date/Time</label><span>5/12/2026 9:04 AM</span></div>
+      <div class="sf-mf"><label>Date/Time Closed</label><span></span></div>
+      <div class="sf-mf"><label>Assignee</label><span></span></div>
+    </div>
+    <div class="sf-tabs"><div class="sf-tab on">Details</div><div class="sf-tab">Files</div><div class="sf-tab">History</div></div>
+
+    <div class="sp-fields">
+      <div class="frow">
+        <div class="fcell"><div class="flbl">Record Name</div><div class="fval">Review Dispute for Case 14091247</div></div>
+        <div class="fcell"><div class="flbl">Status</div><div class="fval">New</div></div>
+      </div>
+      <div class="frow">
+        <div class="fcell"><div class="flbl">Case</div><div class="fval lnk">14091247</div></div>
+        <div class="fcell"><div class="flbl">Escalated Date</div><div class="fval">5/12/2026 9:04 AM</div></div>
+      </div>
+      <div class="frow">
+        <div class="fcell"><div class="flbl">Case Owner Name</div><div class="fval">Proactive MI Queue</div></div>
+        <div class="fcell"><div class="flbl">Reviewed by Date</div><div class="fval dim">—</div></div>
+      </div>
+      <div class="frow">
+        <div class="fcell"></div>
+        <div class="fcell"><div class="flbl">Reviewed By</div><div class="fval dim">—</div></div>
+      </div>
+      <div class="frow">
+        <div class="fcell"><div class="flbl">Dispute Reason</div><div class="fval dd">Request violates user guidelines</div></div>
+        <div class="fcell"><div class="flbl">Manager Decision</div><div class="fval dd dim">Awaiting Decision</div></div>
+      </div>
+      <div class="frow">
+        <div class="fcell"><div class="flbl">Review Link</div><div class="fval"><span class="lnk" style="cursor:pointer;text-decoration:underline" onclick="openAdmin()">https://admin.thumbtack.com/reviews/... ↗</span></div></div>
+        <div class="fcell"><div class="flbl">Approved Reason</div><div class="fval dd dim">--None--</div></div>
+      </div>
+      <div class="frow">
+        <div class="fcell"><div class="flbl">General Comments</div><div class="fval ta">The customer posted my personal email address in the review without my permission. I'm asking for the review to be removed.</div></div>
+        <div class="fcell"><div class="flbl">Manager Comments</div><div class="fval ta dim"></div></div>
+      </div>
+    </div>
+
+    <!-- Admin view (inline, shown after clicking Review Link) -->
+    <div id="admin-view" style="display:none">
+      <div class="admin-wrap">
+        <div class="admin-top"><span class="admin-logo">Thumbtack Admin</span></div>
+        <div class="admin-body">
+          <h2>Review #88291047563XXXX</h2>
+          <div class="admin-layout">
+            <div>
+              <div class="acard">
+                <div class="acard-hdr">Summary</div>
+                <div class="arow"><div class="arow-lbl">Rating</div><div class="arow-val"><span class="star-full">★★★★★</span> (5 stars)</div></div>
+                <div class="arow"><div class="arow-lbl">Customer</div><div class="arow-val"><span class="lnk">Sandra Patel</span></div></div>
+                <div class="arow"><div class="arow-lbl">Professional</div><div class="arow-val"><span class="lnk">Derek Okafor</span></div></div>
+                <div class="arow"><div class="arow-lbl">Business</div><div class="arow-val">OKAFOR ELECTRIC</div></div>
+                <div class="arow"><div class="arow-lbl">Project</div><div class="arow-val">Electrical — Panel Upgrade</div></div>
+                <div class="arow"><div class="arow-lbl">Negotiation</div><div class="arow-val"><span class="lnk">View quote and back-and-forth</span></div></div>
+              </div>
+              <div class="acard">
+                <div class="acard-hdr">Revision History</div>
+                <div class="arow">
+                  <div class="arow-lbl">Text</div>
+                  <div class="arow-val">
+                    <div class="review-text">"Derek was great! Very professional. For future work, reach out to him directly at <span class="highlight">d.okafor.electric@email.com</span> — he's cheaper if you book outside Thumbtack."</div>
+                  </div>
+                </div>
+                <div class="arow"><div class="arow-lbl">Created Time</div><div class="arow-val">May 10, 2026, 3:47 PM</div></div>
+                <div class="arow"><div class="arow-lbl">Customer IP</div><div class="arow-val"><span class="lnk">192.168.XX.XX</span></div></div>
+                <div class="arow"><div class="arow-lbl">Characteristics</div><div class="arow-val" style="color:var(--tt-black-300)">(none)</div></div>
+                <div class="arow"><div class="arow-lbl">Photos</div><div class="arow-val" style="color:var(--tt-black-300)">(none)</div></div>
+              </div>
+            </div>
+            <div>
+              <div class="admin-actions">
+                <div class="admin-acts-hdr">Actions</div>
+                <div class="admin-act-item">Edit Review</div>
+                <div class="admin-act-item">Delete Review Text</div>
+                <div class="admin-act-item">Delete Review</div>
+                <div class="admin-act-item">Associate with Different Customer</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="decision-panel">
+      <div class="feedback" id="fb1"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:13px;color:var(--tt-black-300)" id="s1-hint">Click the Review Link above to open the Admin review thread before continuing.</span>
+        <button class="cont-btn" id="cont1" onclick="goTo(2)">Continue to Step 2 →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN 2: IDENTIFY VIOLATION ══ -->
+  <div class="screen" id="sc2">
+    <div class="inst-bar info">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Step 2 of 5 — Based on what you read, which violation category applies?
+    </div>
+
+    <!-- Condensed case summary -->
+    <div style="background:var(--tt-gray-200);padding:14px 24px;border-bottom:1px solid var(--tt-gray-300);font-size:13px;line-height:1.6">
+      <strong>The case:</strong> Pro Derek Okafor disputes a 5-star review left by Sandra Patel. Dispute Reason: "Request violates user guidelines." Review text: <em>"Derek was great! For future work, reach out to him at d.okafor.electric@email.com — he's cheaper if you book outside Thumbtack."</em>
+    </div>
+
+    <div class="decision-panel">
+      <h3>Select the violation category</h3>
+      <div class="choices" id="choices2">
+        <button class="choice" onclick="choose2(this,'wrong')">No interaction between pro and customer</button>
+        <button class="choice" onclick="choose2(this,'wrong')">Review posted outside the allowable time limit</button>
+        <button class="choice" onclick="choose2(this,'wrong')">Gibberish or unrelated content</button>
+        <button class="choice" onclick="choose2(this,'wrong')">Review intended for a different pro</button>
+        <button class="choice" onclick="choose2(this,'wrong')">Exact duplicate by same customer</button>
+        <button class="choice" onclick="choose2(this,'correct')">PII in review text</button>
+        <button class="choice" onclick="choose2(this,'wrong')">PII or unauthorized content in images</button>
+        <button class="choice" onclick="choose2(this,'wrong')">Promotes another business or service</button>
+        <button class="choice" onclick="choose2(this,'wrong')">24-hour exception</button>
+        <button class="choice" onclick="choose2(this,'wrong')">Fake or AI-generated images</button>
+        <button class="choice" onclick="choose2(this,'wrong')">No violation — Leave Review #CBB</button>
+      </div>
+      <div class="feedback" id="fb2"></div>
+      <button class="cont-btn" id="cont2" onclick="goTo(3)">Continue to Step 3 →</button>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN 3: ADMIN ACTION ══ -->
+  <div class="screen" id="sc3">
+    <div class="inst-bar info">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Step 3 of 5 — You've identified the violation. What's the Admin Action?
+    </div>
+
+    <div style="background:var(--tt-green-tint);padding:12px 24px;border-bottom:1px solid var(--tt-green);font-size:13px;display:flex;align-items:center;gap:8px">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--tt-green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <strong style="color:var(--tt-green)">Violation identified:</strong> PII in review text — personal email address present
+    </div>
+
+    <div class="decision-panel">
+      <h3>Select the Admin Action</h3>
+      <div class="choices" id="choices3">
+        <button class="choice" onclick="choose3(this,'wrong')">Edit Review (remove the email address)</button>
+        <button class="choice" onclick="choose3(this,'correct')">Delete Review</button>
+        <button class="choice" onclick="choose3(this,'wrong')">Leave the review — no Admin action needed</button>
+      </div>
+      <div class="feedback" id="fb3"></div>
+      <button class="cont-btn" id="cont3" onclick="goTo(4)">Continue to Step 4 →</button>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN 4: INTERNAL NOTE + MANAGER DECISION ══ -->
+  <div class="screen" id="sc4">
+    <div class="inst-bar info">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Step 4 of 5 — Select the Salesforce Internal Note and Manager Decision.
+    </div>
+
+    <div style="background:var(--tt-green-tint);padding:12px 24px;border-bottom:1px solid var(--tt-green);font-size:13px;display:flex;align-items:center;gap:20px">
+      <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--tt-green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><polyline points="20 6 9 17 4 12"/></svg><strong style="color:var(--tt-green)">Violation:</strong> PII in review text</span>
+      <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--tt-green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><polyline points="20 6 9 17 4 12"/></svg><strong style="color:var(--tt-green)">Admin Action:</strong> Delete Review</span>
+    </div>
+
+    <div class="decision-panel">
+      <h3>Select the Salesforce Internal Note</h3>
+      <div class="choices" id="choices4a" style="margin-bottom:20px">
+        <button class="choice" onclick="choose4a(this,'wrong')">Review Dispute - Removed (No Interaction)</button>
+        <button class="choice" onclick="choose4a(this,'wrong')">Review Dispute - Removed (Unrelated Content)</button>
+        <button class="choice" onclick="choose4a(this,'correct')">Review Dispute - Removed (PII present)</button>
+        <button class="choice" onclick="choose4a(this,'wrong')">Review Dispute - Removed (Commercial Promotion)</button>
+        <button class="choice" onclick="choose4a(this,'wrong')">Review Dispute - Removed (Wrong Pro)</button>
+      </div>
+      <div class="feedback" id="fb4a"></div>
+
+      <div id="mgr-dec-section" style="display:none">
+        <h3 style="margin-top:16px;padding-top:16px;border-top:1px solid var(--tt-gray-300)">Select the Manager Decision</h3>
+        <div class="choices" id="choices4b">
+          <button class="choice" onclick="choose4b(this,'wrong')">Awaiting Decision</button>
+          <button class="choice" onclick="choose4b(this,'correct')">Removed Review</button>
+          <button class="choice" onclick="choose4b(this,'wrong')">Leave Review #CBB</button>
+        </div>
+        <div class="feedback" id="fb4b"></div>
+      </div>
+
+      <button class="cont-btn" id="cont4" onclick="goTo(5)">Continue to Step 5 →</button>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN 5: MANAGER COMMENT ══ -->
+  <div class="screen" id="sc5">
+    <div class="inst-bar info">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Step 5 of 5 — Write the Manager Comment. Use the template language from the table and add one sentence naming the specific evidence.
+    </div>
+
+    <div style="background:var(--tt-green-tint);padding:12px 24px;border-bottom:1px solid var(--tt-green);font-size:13px;display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+      <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--tt-green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><polyline points="20 6 9 17 4 12"/></svg><strong style="color:var(--tt-green)">Violation:</strong> PII in review text</span>
+      <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--tt-green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><polyline points="20 6 9 17 4 12"/></svg><strong style="color:var(--tt-green)">Admin Action:</strong> Delete Review</span>
+      <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--tt-green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><polyline points="20 6 9 17 4 12"/></svg><strong style="color:var(--tt-green)">Internal Note:</strong> Review Dispute - Removed (PII present)</span>
+      <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--tt-green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><polyline points="20 6 9 17 4 12"/></svg><strong style="color:var(--tt-green)">Manager Decision:</strong> Removed Review</span>
+    </div>
+
+    <div class="decision-panel">
+      <h3>Write the Manager Comment</h3>
+      <p class="mc-helper">Use the template language from the PII row of the Removal & Actioning Table. Then add one sentence naming what specific evidence in this case led you to the PII violation.</p>
+      <textarea class="mc-area" id="mc-input" placeholder="Type your Manager Comment here..."></textarea>
+      <br>
+      <button class="mc-submit" onclick="submitMC()">Submit Manager Comment</button>
+
+      <div class="model-wrap" id="model-wrap">
+        <h3 style="margin:16px 0 12px">How did you do?</h3>
+        <div class="model-cols">
+          <div class="model-col yours">
+            <div class="model-col-label">Your comment</div>
+            <div class="model-col-text" id="your-mc"></div>
+          </div>
+          <div class="model-col model">
+            <div class="model-col-label">Model answer</div>
+            <div class="model-col-text">The review has been removed as it violates privacy standards (PII). The review text included the pro's personal email address (d.okafor.electric@email.com).</div>
+          </div>
+        </div>
+        <div class="criteria" id="criteria-list"></div>
+        <button class="cont-btn show" onclick="goTo(6)" style="margin-top:8px">See full debrief →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN 6: DEBRIEF ══ -->
+  <div class="screen" id="sc6">
+    <div class="debrief">
+      <div class="debrief-score">
+        <div class="score-ico"><svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
+        <div class="score-text">
+          <h2>Case complete.</h2>
+          <p>You worked through all five decision steps on Derek Okafor's case. Here's the full decision record.</p>
+        </div>
+      </div>
+
+      <div class="decision-summary">
+        <h3>Your decision record — Case 14091247</h3>
+        <div class="ds-row"><div class="ds-label">Violation category</div><div class="ds-val correct">PII in review text</div></div>
+        <div class="ds-row"><div class="ds-label">Admin Action</div><div class="ds-val correct">Delete Review</div></div>
+        <div class="ds-row"><div class="ds-label">Salesforce Internal Note</div><div class="ds-val correct">Review Dispute - Removed (PII present)</div></div>
+        <div class="ds-row"><div class="ds-label">Manager Decision</div><div class="ds-val correct">Removed Review</div></div>
+        <div class="ds-row">
+          <div class="ds-label">Manager Comment</div>
+          <div class="ds-val">
+            <div style="background:var(--tt-green-tint);border:1.5px solid var(--tt-green);border-radius:6px;padding:10px 12px;font-size:13px;line-height:1.6;margin-bottom:8px">The review has been removed as it violates privacy standards (PII). The review text included the pro's personal email address (d.okafor.electric@email.com).</div>
+            <div style="font-size:12px;color:var(--tt-black-300)">Template language + one sentence naming the specific evidence. That's the standard.</div>
+          </div>
+        </div>
+      </div>
+
+
+
+      <div style="background:var(--tt-blue-tint);border-left:4px solid var(--tt-blue);border-radius:0 8px 8px 0;padding:14px 18px;margin-bottom:20px;font-size:13px;line-height:1.6">
+        <strong>What this case teaches:</strong> The Dispute Reason tells you what the Thumbtack rep reporting or pro flagged. The table tells you what actually qualifies for removal. Work the evidence first — then find the row.
+      </div>
+      <button class="replay-btn" onclick="replay()">↺ Replay simulation</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  var adminOpened = false;
+  var step2done = false, step3done = false, step4adone = false, step4bdone = false;
+
+  function openAdmin(){
+    document.getElementById('admin-view').style.display = 'block';
+    adminOpened = true;
+    document.getElementById('s1-hint').textContent = 'You\'ve read the evidence. Continue when you\'re ready.';
+    document.getElementById('cont1').classList.add('show');
+  }
+
+  function goTo(n){
+    for(var i=1;i<=6;i++){
+      document.getElementById('sc'+i).classList.remove('active');
+    }
+    document.getElementById('sc'+n).classList.add('active');
+    updateProgress(n);
+    window.scrollTo(0,0);
+  }
+
+  function updateProgress(n){
+    document.getElementById('step-label').textContent = Math.min(n,5);
+    for(var i=1;i<=5;i++){
+      var el = document.getElementById('ps'+i);
+      el.classList.remove('active','done');
+      if(i < n) el.classList.add('done');
+      else if(i === n && n <= 5) el.classList.add('active');
+    }
+  }
+
+  function lockChoices(container){
+    container.querySelectorAll('.choice').forEach(function(b){
+      b.disabled = true;
+      if(!b.classList.contains('correct') && !b.classList.contains('incorrect')){
+        b.classList.add('dimmed');
+      }
+    });
+  }
+
+  function choose2(el, result){
+    if(step2done) return;
+    var fb = document.getElementById('fb2');
+    if(result === 'correct'){
+      el.classList.add('correct');
+      fb.className = 'feedback correct show';
+      fb.innerHTML = '<div class="feedback-icon">✓ Correct</div>The review text contains a personal email address — that\'s PII. Note that the Dispute Reason ("Request violates user guidelines") pointed you in the right direction, but PII has its own row in the table. Always match to the violation you find in the evidence.';
+      step2done = true;
+      lockChoices(document.getElementById('choices2'));
+      document.getElementById('cont2').classList.add('show');
+    } else {
+      el.classList.add('incorrect');
+      var msg = '';
+      var txt = el.textContent.trim();
+      if(txt.indexOf('No interaction') > -1) msg = 'A real interaction happened — Sandra posted a 5-star review of a job Derek completed. Look more carefully at the review text itself.';
+      else if(txt.indexOf('No violation') > -1) msg = 'Look again at the review text. The customer included the pro\'s personal email address. That meets the PII threshold.';
+      else if(txt.indexOf('Promotes') > -1) msg = 'Commercial promotion covers content that advertises a competing business or service. The email address is the pro\'s personal contact — that\'s PII, not promotion.';
+      else msg = 'Not quite. Read the review text carefully — the customer included personal contact information. Which category covers that?';
+      fb.className = 'feedback incorrect show';
+      fb.innerHTML = '<div class="feedback-icon">✗ Not quite</div>' + msg;
+    }
+  }
+
+  function choose3(el, result){
+    if(step3done) return;
+    var fb = document.getElementById('fb3');
+    if(result === 'correct'){
+      el.classList.add('correct');
+      fb.className = 'feedback correct show';
+      fb.innerHTML = '<div class="feedback-icon">✓ Correct</div>Delete Review is the Admin Action for PII violations. Editing the review to remove only the email address is not permitted — the entire review comes down.';
+      step3done = true;
+      lockChoices(document.getElementById('choices3'));
+      document.getElementById('cont3').classList.add('show');
+    } else {
+      el.classList.add('incorrect');
+      var msg = '';
+      if(el.textContent.indexOf('Edit') > -1) msg = 'Editing the review to remove just the email is not the correct action for PII. The entire review is deleted — check the table row.';
+      else msg = 'PII requires an Admin action. The review doesn\'t stay.';
+      fb.className = 'feedback incorrect show';
+      fb.innerHTML = '<div class="feedback-icon">✗ Not quite</div>' + msg;
+    }
+  }
+
+  function choose4a(el, result){
+    if(step4adone) return;
+    var fb = document.getElementById('fb4a');
+    if(result === 'correct'){
+      el.classList.add('correct');
+      fb.className = 'feedback correct show';
+      fb.innerHTML = '<div class="feedback-icon">✓ Correct</div>Review Dispute - Removed (PII present) matches the PII in review text row exactly.';
+      step4adone = true;
+      lockChoices(document.getElementById('choices4a'));
+      document.getElementById('mgr-dec-section').style.display = 'block';
+    } else {
+      el.classList.add('incorrect');
+      fb.className = 'feedback incorrect show';
+      fb.innerHTML = '<div class="feedback-icon">✗ Not quite</div>The Internal Note must match the violation category exactly. You identified PII in review text — find the note that corresponds to that row.';
+    }
+  }
+
+  function choose4b(el, result){
+    if(step4bdone) return;
+    var fb = document.getElementById('fb4b');
+    if(result === 'correct'){
+      el.classList.add('correct');
+      fb.className = 'feedback correct show';
+      fb.innerHTML = '<div class="feedback-icon">✓ Correct</div>Removed Review is the Manager Decision for all removal cases.';
+      step4bdone = true;
+      lockChoices(document.getElementById('choices4b'));
+      document.getElementById('cont4').classList.add('show');
+    } else {
+      el.classList.add('incorrect');
+      var msg = el.textContent.indexOf('Leave') > -1
+        ? 'Leave Review #CBB is for no-violation cases. You\'ve confirmed a PII violation — the review comes down.'
+        : 'Awaiting Decision is the default state before a decision is made. You\'ve made your decision — select the correct value.';
+      fb.className = 'feedback incorrect show';
+      fb.innerHTML = '<div class="feedback-icon">✗ Not quite</div>' + msg;
+    }
+  }
+
+  function submitMC(){
+    var mc = document.getElementById('mc-input').value.trim();
+    if(!mc){ alert('Please write your Manager Comment before submitting.'); return; }
+
+    document.getElementById('your-mc').textContent = mc;
+    document.getElementById('mc-input').disabled = true;
+    document.querySelector('.mc-submit').style.display = 'none';
+
+    // Evaluate criteria
+    var mcLower = mc.toLowerCase();
+    var hasTemplate = mcLower.indexOf('privacy standards') > -1 || mcLower.indexOf('pii') > -1;
+    var hasEvidence = mcLower.indexOf('email') > -1 || mcLower.indexOf('d.okafor') > -1 || mcLower.indexOf('contact') > -1;
+    var criteria = [
+      { pass: hasTemplate, label: 'Template language present', detail: hasTemplate ? 'References privacy standards or PII.' : 'Missing. Start with: "The review has been removed as it violates privacy standards (PII)."' },
+      { pass: hasEvidence, label: 'Specific evidence named', detail: hasEvidence ? 'Names the email address or contact information.' : 'Missing. Name the specific PII you found — the email address in the review text.' },
+    ];
+
+    var html = '';
+    criteria.forEach(function(c){
+      html += '<div class="criterion ' + (c.pass ? 'pass' : 'fail') + '">';
+      html += '<div class="crit-ico"><svg viewBox="0 0 24 24">' + (c.pass ? '<polyline points="20 6 9 17 4 12"/>' : '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>') + '</svg></div>';
+      html += '<div><strong>' + c.label + '</strong><br>' + c.detail + '</div></div>';
+    });
+    document.getElementById('criteria-list').innerHTML = html;
+    document.getElementById('model-wrap').classList.add('show');
+  }
+
+  function replay(){
+    // Reset all state
+    adminOpened = false; step2done = false; step3done = false; step4adone = false; step4bdone = false;
+    document.getElementById('admin-view').style.display = 'none';
+    document.getElementById('s1-hint').textContent = 'Click the Review Link above to open the Admin review thread before continuing.';
+    document.getElementById('cont1').classList.remove('show');
+    document.querySelectorAll('.choice').forEach(function(b){ b.className='choice'; b.disabled=false; });
+    document.querySelectorAll('.feedback').forEach(function(f){ f.className='feedback'; f.innerHTML=''; });
+    document.querySelectorAll('.cont-btn').forEach(function(b){ b.classList.remove('show'); });
+    document.getElementById('mgr-dec-section').style.display = 'none';
+    document.getElementById('mc-input').value = ''; document.getElementById('mc-input').disabled = false;
+    document.querySelector('.mc-submit').style.display = 'inline-block';
+    document.getElementById('model-wrap').classList.remove('show');
+    goTo(1);
+  }
+</script>
+</body>
+</html>
