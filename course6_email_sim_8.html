@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Activity 3: Fill the Template</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Salesforce Sans', 'Helvetica Neue', Arial, sans-serif;
+    background: #F3F2F2;
+    color: #2F3033;
+    min-height: 100vh;
+    padding: 32px 24px 80px;
+  }
+
+  .container { max-width: 900px; margin: 0 auto; }
+
+  .activity-header {
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+    border-left: 4px solid #009FD9;
+  }
+
+  .activity-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #009FD9;
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  .activity-header h1 { font-size: 22px; font-weight: 800; color: #2F3033; margin-bottom: 8px; }
+  .activity-header p { font-size: 14px; color: #555; line-height: 1.7; }
+
+  .template-reminder {
+    background: #FFF9F0;
+    border: 1px solid #F5A623;
+    border-radius: 6px;
+    padding: 12px 18px;
+    margin-bottom: 16px;
+    font-size: 14px;
+    color: #7A5000;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    line-height: 1.7;
+  }
+
+  .template-reminder strong { color: #2F3033; }
+
+  .progress-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    align-items: center;
+  }
+
+  .progress-dot { width: 28px; height: 4px; border-radius: 2px; background: #E0E0E0; transition: background 0.3s; }
+  .progress-dot.active { background: #009FD9; }
+  .progress-dot.complete { background: #2DB783; }
+  .progress-label { font-size: 12px; color: #888; margin-left: 4px; }
+
+  .scenario-bar {
+    background: #2F3033;
+    color: #fff;
+    padding: 20px 24px;
+    font-size: 16px;
+    line-height: 1.7;
+    border-radius: 6px 6px 0 0;
+  }
+
+  .scenario-bar strong {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: #009FD9;
+    margin-bottom: 8px;
+  }
+
+  .sf-shell {
+    background: #fff;
+    border: 1px solid #DDDBDA;
+    border-radius: 0 0 6px 6px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+
+  .sf-tabs {
+    display: flex;
+    border-bottom: 1px solid #DDDBDA;
+    background: #F3F2F2;
+    padding: 0 16px;
+    gap: 2px;
+    overflow-x: auto;
+  }
+
+  .sf-tab {
+    padding: 10px 16px;
+    font-size: 12.5px;
+    color: #444;
+    border-bottom: 2px solid transparent;
+    cursor: default;
+    font-weight: 500;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .sf-tab.active { color: #005FB2; border-bottom-color: #005FB2; background: #fff; font-weight: 700; }
+
+  .sf-subtabs {
+    display: flex;
+    border-bottom: 1px solid #DDDBDA;
+    padding: 0 16px;
+    gap: 2px;
+    background: #fff;
+    overflow-x: auto;
+  }
+
+  .sf-subtab {
+    padding: 8px 14px;
+    font-size: 12px;
+    color: #444;
+    cursor: default;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .sf-subtab.active { color: #005FB2; border-bottom-color: #005FB2; font-weight: 700; }
+
+  .sf-form { padding: 12px 20px 0; }
+
+  .sf-field {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 8px 0;
+    border-bottom: 1px solid #F3F2F2;
+    min-height: 40px;
+  }
+
+  .sf-field-label { font-size: 13px; font-weight: 600; color: #444; min-width: 64px; flex-shrink: 0; }
+  .sf-field-value { font-size: 14px; color: #2F3033; flex: 1; }
+
+  .sf-select-wrapper { flex: 1; position: relative; }
+
+  .sf-select {
+    width: 100%;
+    padding: 8px 28px 8px 12px;
+    border: 1px solid #DDDBDA;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: inherit;
+    color: #2F3033;
+    background: #fff;
+    appearance: none;
+    cursor: pointer;
+    outline: none;
+  }
+
+  .sf-select:focus { border-color: #005FB2; box-shadow: 0 0 0 2px rgba(0,95,178,0.15); }
+  .sf-select.error { border-color: #C23934; background: #FEF1EE; }
+  .sf-select.success { border-color: #2DB783; }
+  .sf-select-arrow { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #777; font-size: 10px; }
+
+  .to-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #E8F4FF;
+    border: 1px solid #C5DFF8;
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 12.5px;
+    color: #005FB2;
+    font-weight: 500;
+  }
+
+  .to-pill-icon {
+    width: 16px; height: 16px;
+    background: #005FB2;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .sf-subject {
+    flex: 1;
+    padding: 6px 10px;
+    border: 1px solid #DDDBDA;
+    border-radius: 4px;
+    font-size: 13px;
+    font-family: inherit;
+    color: #2F3033;
+    background: #F8F8F8;
+    outline: none;
+  }
+
+  .sf-body-area {
+    margin: 12px 20px 0;
+    border: 1px solid #DDDBDA;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .sf-toolbar {
+    background: #F3F2F2;
+    border-bottom: 1px solid #DDDBDA;
+    padding: 6px 10px;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .sf-tool-btn {
+    padding: 3px 7px;
+    font-size: 12px;
+    border: 1px solid #DDDBDA;
+    border-radius: 3px;
+    background: #fff;
+    color: #444;
+    cursor: default;
+  }
+
+  .sf-tool-sep { width: 1px; height: 16px; background: #DDDBDA; }
+
+  .email-content {
+    padding: 20px 24px;
+    font-size: 15px;
+    line-height: 1.9;
+    color: #2F3033;
+    background: #fff;
+  }
+
+  .email-content p { margin-bottom: 14px; }
+  .email-content p:last-child { margin-bottom: 0; }
+
+  .placeholder-wrapper { margin: 4px 0 12px; }
+
+  .placeholder-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #C23934;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  .placeholder-field {
+    width: 100%;
+    min-height: 80px;
+    border: 2px solid #C23934;
+    border-radius: 4px;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-family: inherit;
+    color: #2F3033;
+    background: #FEF9F9;
+    resize: vertical;
+    line-height: 1.7;
+    transition: border-color 0.2s, background 0.2s;
+    outline: none;
+  }
+
+  .placeholder-field:focus { border-color: #005FB2; background: #fff; }
+  .placeholder-field.success { border-color: #2DB783; background: #F0FBF6; }
+  .placeholder-field.flagged { border-color: #F5A623; background: #FFFBF0; }
+
+  .char-hint { font-size: 11px; color: #aaa; margin-top: 3px; text-align: right; }
+
+  .feedback {
+    display: none;
+    margin-top: 8px;
+    padding: 10px 14px;
+    border-radius: 4px;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  .feedback.flag { background: #FFF9F0; border-left: 3px solid #F5A623; color: #7A5000; display: block; }
+  .feedback.empty { background: #FEF1EE; border-left: 3px solid #C23934; color: #8B2020; display: block; }
+  .feedback.good { background: #F0FBF6; border-left: 3px solid #2DB783; color: #1A6644; display: block; }
+  .feedback.address-error { background: #FEF1EE; border-left: 3px solid #C23934; color: #8B2020; display: block; }
+
+  .model-answer {
+    display: none;
+    margin-top: 10px;
+    background: #F0FBF6;
+    border: 1.5px solid #2DB783;
+    border-radius: 6px;
+    padding: 14px 18px;
+  }
+
+  .model-answer.visible { display: block; }
+
+  .model-answer-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #2DB783;
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  .model-answer p { font-size: 14px; color: #1A4A35; line-height: 1.8; font-style: italic; }
+
+  /* STICKY FEEDBACK BANNER */
+  .sticky-banner {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    padding: 14px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.5;
+    box-shadow: 0 -4px 16px rgba(0,0,0,0.15);
+    cursor: pointer;
+    transition: opacity 0.3s;
+  }
+
+  .sticky-banner.visible { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .sticky-banner.good { background: #2DB783; color: #fff; }
+  .sticky-banner.flag { background: #F5A623; color: #fff; }
+  .sticky-banner.error { background: #C23934; color: #fff; }
+
+  .sticky-banner-text { flex: 1; }
+  .sticky-banner-arrow {
+    font-size: 20px;
+    animation: bounce 1s infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+  }
+
+  .address-feedback { display: none; margin: 4px 20px 0; }
+  .address-feedback.visible { display: block; }
+
+  .sf-send-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px 16px;
+    border-top: 1px solid #F3F2F2;
+    margin-top: 12px;
+  }
+
+  .sf-btn {
+    padding: 8px 20px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.15s;
+  }
+
+  .sf-btn-primary { background: #0070D2; color: #fff; border-color: #0070D2; }
+  .sf-btn-primary:hover { background: #005FB2; }
+  .sf-btn-ghost { background: transparent; color: #666; border-color: #DDDBDA; }
+  .sf-btn-ghost:hover { background: #F3F2F2; }
+
+  .sf-send-left { display: flex; gap: 10px; align-items: center; }
+  .sf-send-right { display: flex; gap: 10px; align-items: center; }
+  .saved-label { font-size: 12px; color: #999; }
+
+  .completion {
+    display: none;
+    background: #fff;
+    border-radius: 8px;
+    padding: 48px 40px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+
+  .completion.visible { display: block; }
+  .completion-icon { font-size: 44px; margin-bottom: 16px; }
+  .completion h2 { font-size: 22px; font-weight: 800; color: #2F3033; margin-bottom: 10px; }
+  .completion > p { font-size: 13.5px; color: #555; line-height: 1.7; max-width: 480px; margin: 0 auto 24px; }
+
+  .completion-rules {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    text-align: left;
+    max-width: 540px;
+    margin: 0 auto 32px;
+  }
+
+  .completion-rule {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: #F8F8F8;
+    border-radius: 6px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: #2F3033;
+    line-height: 1.6;
+  }
+
+  .rule-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="activity-header">
+    <span class="activity-label">Activity 3</span>
+    <h1>Fill the Template</h1>
+    <p>Two emails to send. Select the correct From address, and fill in the placeholder correctly before sending. Thin or empty placeholders will be flagged.</p>
+  </div>
+
+  <div class="template-reminder">
+    ⚠️ <span><strong>Always use the Salesforce template — never type the email from scratch.</strong> Templates ensure consistent formatting, correct sender addresses, and locked policy language.</span>
+  </div>
+
+  <div class="progress-row">
+    <div class="progress-dot active" id="dot1"></div>
+    <div class="progress-dot" id="dot2"></div>
+    <span class="progress-label" id="progress-label">Email 1 of 2</span>
+  </div>
+
+  <!-- EMAIL 1 -->
+  <div id="email1">
+    <div class="scenario-bar">
+      <strong>Scenario — Email 1 of 2</strong>
+      A pro disputes a review, claiming it was intended for a different pro with a similar name. You need proof of work and proof of outreach to multiple pros from the customer before you can decide.
+    </div>
+
+    <div class="sf-shell">
+      <div class="sf-tabs">
+        <div class="sf-tab active">Email + Actions</div>
+        <div class="sf-tab">Find User</div>
+        <div class="sf-tab">Details</div>
+        <div class="sf-tab">Related</div>
+        <div class="sf-tab">History</div>
+      </div>
+      <div class="sf-subtabs">
+        <div class="sf-subtab active">Email</div>
+        <div class="sf-subtab">Post</div>
+        <div class="sf-subtab">Review Dispute</div>
+        <div class="sf-subtab">Do Not Survey Re...</div>
+        <div class="sf-subtab">System</div>
+        <div class="sf-subtab">Submit Urgent Re...</div>
+        <div class="sf-subtab">Emergency Calling</div>
+      </div>
+
+      <div class="sf-form">
+        <div class="sf-field">
+          <span class="sf-field-label">From</span>
+          <div class="sf-select-wrapper">
+            <select class="sf-select" id="from1" onchange="clearAddressFeedback(1)">
+              <option value="">-- Select sender address --</option>
+              <option value="wrong1">Support &lt;support@&gt;</option>
+              <option value="dnr">do-not-reply &lt;do-not-reply@&gt;</option>
+              <option value="ts">Trust &amp; Safety &lt;trustandsafetyteam@&gt;</option>
+              <option value="wrong2">Bug Reports &lt;bugreport@&gt;</option>
+              <option value="wrong3">Data Privacy &lt;dataprivacy@&gt;</option>
+            </select>
+            <span class="sf-select-arrow">▾</span>
+          </div>
+        </div>
+        <div class="feedback address-feedback" id="addr-feedback1"></div>
+
+        <div class="sf-field">
+          <span class="sf-field-label">To</span>
+          <div class="sf-field-value">
+            <span class="to-pill">
+              <span class="to-pill-icon">C</span>
+              Customer <span style="color:#888;font-size:11px;margin-left:4px;">Auto-populated by Salesforce</span>
+            </span>
+          </div>
+        </div>
+
+        <div class="sf-field">
+          <span class="sf-field-label">Subject</span>
+          <input class="sf-subject" type="text" value="Review Dispute: Need more information/Documentation" readonly>
+        </div>
+      </div>
+
+      <div class="sf-body-area">
+        <div class="sf-toolbar">
+          <button class="sf-tool-btn">B</button>
+          <button class="sf-tool-btn"><i>I</i></button>
+          <button class="sf-tool-btn"><u>U</u></button>
+          <div class="sf-tool-sep"></div>
+          <button class="sf-tool-btn">Link</button>
+          <div class="sf-tool-sep"></div>
+          <span style="font-size:11px;color:#888;">Template loaded</span>
+        </div>
+        <div class="email-content">
+          <p>We are reaching out to follow up about the review dispute you submitted. We need additional documents/information to proceed with our investigation.</p>
+          <p>Please reply to this email with the following information:</p>
+          <div class="placeholder-wrapper">
+            <div class="placeholder-label">● Required — fill before sending: [INSERT SPECIFIC REQUEST FOR DOCUMENTATION]</div>
+            <textarea class="placeholder-field" id="ph1" placeholder="Type your specific documentation request here..." oninput="updateChar(1)" rows="3"></textarea>
+            <div class="char-hint" id="char1">0 characters</div>
+            <div class="feedback" id="feedback1"></div>
+            <div class="model-answer" id="model1">
+              <span class="model-answer-label">✓ Strong placeholder example</span>
+              <p>"Please provide proof that you hired or attempted to hire [Pro Name], such as a contract, invoice, or confirmation of direct communication. Please also provide any evidence that you reached out to multiple professionals with a similar name during this period."</p>
+            </div>
+          </div>
+          <p>This review dispute will remain under review, and the decision will be pending until this information is received. Please submit the required information at your earliest convenience.</p>
+          <p>If you have questions, you can reply to this email.</p>
+          <p>Thank you,<br>Trust &amp; Safety</p>
+        <div class="sf-send-right">
+          <button class="sf-btn sf-btn-ghost" onclick="resetEmail(1)">Reset</button>
+          <button class="sf-btn sf-btn-primary" onclick="checkEmail(1)">Send Email</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EMAIL 2 -->
+  <div id="email2" style="display:none;">
+    <div class="scenario-bar">
+      <strong>Scenario — Email 2 of 2</strong>
+      A pro claimed the review was factually false. After investigation, the review describes a service experience and does not meet a violation threshold. Decision: Leave Review #CBB.
+    </div>
+
+    <div class="sf-shell">
+      <div class="sf-tabs">
+        <div class="sf-tab active">Email + Actions</div>
+        <div class="sf-tab">Find User</div>
+        <div class="sf-tab">Details</div>
+        <div class="sf-tab">Related</div>
+        <div class="sf-tab">History</div>
+      </div>
+      <div class="sf-subtabs">
+        <div class="sf-subtab active">Email</div>
+        <div class="sf-subtab">Post</div>
+        <div class="sf-subtab">Review Dispute</div>
+        <div class="sf-subtab">Do Not Survey Re...</div>
+        <div class="sf-subtab">System</div>
+        <div class="sf-subtab">Submit Urgent Re...</div>
+        <div class="sf-subtab">Emergency Calling</div>
+      </div>
+
+      <div class="sf-form">
+        <div class="sf-field">
+          <span class="sf-field-label">From</span>
+          <div class="sf-select-wrapper">
+            <select class="sf-select" id="from2" onchange="clearAddressFeedback(2)">
+              <option value="">-- Select sender address --</option>
+              <option value="wrong1">Support &lt;support@&gt;</option>
+              <option value="ts">Trust &amp; Safety &lt;trustandsafetyteam@&gt;</option>
+              <option value="dnr">do-not-reply &lt;do-not-reply@&gt;</option>
+              <option value="wrong2">Bug Reports &lt;bugreport@&gt;</option>
+              <option value="wrong3">Data Privacy &lt;dataprivacy@&gt;</option>
+            </select>
+            <span class="sf-select-arrow">▾</span>
+          </div>
+        </div>
+        <div class="feedback address-feedback" id="addr-feedback2"></div>
+
+        <div class="sf-field">
+          <span class="sf-field-label">To</span>
+          <div class="sf-field-value">
+            <span class="to-pill">
+              <span class="to-pill-icon">P</span>
+              Pro <span style="color:#888;font-size:11px;margin-left:4px;">Auto-populated by Salesforce</span>
+            </span>
+          </div>
+        </div>
+
+        <div class="sf-field">
+          <span class="sf-field-label">Subject</span>
+          <input class="sf-subject" type="text" value="Review Dispute: Review Not Removed" readonly>
+        </div>
+      </div>
+
+      <div class="sf-body-area">
+        <div class="sf-toolbar">
+          <button class="sf-tool-btn">B</button>
+          <button class="sf-tool-btn"><i>I</i></button>
+          <button class="sf-tool-btn"><u>U</u></button>
+          <div class="sf-tool-sep"></div>
+          <button class="sf-tool-btn">Link</button>
+          <div class="sf-tool-sep"></div>
+          <span style="font-size:11px;color:#888;">Template loaded</span>
+        </div>
+        <div class="email-content">
+          <p>Thank you for submitting your review dispute. We've completed our investigation.</p>
+          <p>We've thoroughly investigated your concerns regarding this review. We found that because</p>
+          <div class="placeholder-wrapper">
+            <div class="placeholder-label">● Required — fill before sending: [INSERT REASON FROM MANAGER COMMENTS]</div>
+            <textarea class="placeholder-field" id="ph2" placeholder="Type the reason from your Manager Comments here..." oninput="updateChar(2)" rows="3"></textarea>
+            <div class="char-hint" id="char2">0 characters</div>
+            <div class="feedback" id="feedback2"></div>
+            <div class="model-answer" id="model2">
+              <span class="model-answer-label">✓ Strong placeholder example</span>
+              <p>"the review describes a service experience between the customer and pro and does not meet the threshold for removal under our Content and Review Policy"</p>
+            </div>
+          </div>
+          <p>, it does not violate our Content and Review Policy. We understand this may be disappointing, but the review will remain on your profile. This decision is final.</p>
+          <p>If you have additional questions, please contact our support team.</p>
+          <p>Thank you,<br>Trust &amp; Safety</p>
+        </div>
+      </div>
+
+      <div class="sf-send-bar">
+        <div class="sf-send-left">
+          <button class="sf-btn sf-btn-ghost" onclick="goBack()">← Back</button>
+        </div>
+        <div class="sf-send-right">
+          <button class="sf-btn sf-btn-ghost" onclick="resetEmail(2)">Reset</button>
+          <button class="sf-btn sf-btn-primary" onclick="checkEmail(2)">Send Email</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPLETION -->
+  <div class="completion" id="completion">
+    <div class="completion-icon">✅</div>
+    <h2>Both emails sent correctly.</h2>
+    <p>You selected the right address, used the right template, and filled every placeholder with something specific and defensible. That's what closes a case cleanly.</p>
+    <div class="completion-rules">
+      <div class="completion-rule">
+        <span class="rule-icon">📋</span>
+        <span><strong>Need More Information</strong> → trustandsafetyteam@. Placeholder names the exact documents needed.</span>
+      </div>
+      <div class="completion-rule">
+        <span class="rule-icon">📩</span>
+        <span><strong>Review Not Removed</strong> → do-not-reply@. No status change. Placeholder states what was reviewed and why it didn't meet the removal threshold.</span>
+      </div>
+      <div class="completion-rule">
+        <span class="rule-icon">🚫</span>
+        <span><strong>"See notes" is not a reason.</strong> The pro reads what you write. It must be specific enough to be defensible.</span>
+      </div>
+    </div>
+    <button class="sf-btn sf-btn-ghost" onclick="resetAll()">Start over</button>
+  </div>
+
+  <!-- STICKY FEEDBACK BANNER -->
+  <div class="sticky-banner" id="sticky-banner" onclick="dismissBanner()">
+    <span class="sticky-banner-text" id="sticky-text"></span>
+    <span class="sticky-banner-arrow">↓ Scroll to continue</span>
+  </div>
+
+</div>
+<script>
+  function showBanner(type, message) {
+    if (type !== 'good') return;
+    const banner = document.getElementById('sticky-banner');
+    const text = document.getElementById('sticky-text');
+    banner.className = 'sticky-banner visible ' + type;
+    text.textContent = message;
+  }
+
+  function dismissBanner() {
+    document.getElementById('sticky-banner').className = 'sticky-banner';
+  }
+
+  // Dismiss green banner when user scrolls to bottom
+  window.addEventListener('scroll', function() {
+    const scrolledToBottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100;
+    if (scrolledToBottom) dismissBanner();
+  });
+
+  function updateChar(n) {
+    document.getElementById('char' + n).textContent = document.getElementById('ph' + n).value.length + ' characters';
+    clearFeedback(n);
+  }
+
+  function clearFeedback(n) {
+    const fb = document.getElementById('feedback' + n);
+    fb.className = 'feedback';
+    fb.textContent = '';
+    document.getElementById('ph' + n).classList.remove('flagged', 'success');
+  }
+
+  function clearAddressFeedback(n) {
+    const fb = document.getElementById('addr-feedback' + n);
+    fb.className = 'feedback address-feedback';
+    fb.textContent = '';
+    document.getElementById('from' + n).classList.remove('error', 'success');
+  }
+
+  function checkEmail(n) {
+    const fromVal = document.getElementById('from' + n).value;
+    const phVal = document.getElementById('ph' + n).value.trim();
+    const fromEl = document.getElementById('from' + n);
+    const addrFb = document.getElementById('addr-feedback' + n);
+    const fb = document.getElementById('feedback' + n);
+    const field = document.getElementById('ph' + n);
+    const model = document.getElementById('model' + n);
+    const correctFrom = n === 1 ? 'ts' : 'dnr';
+    const wrongRouting = n === 1 ? 'dnr' : 'ts';
+
+    dismissBanner();
+
+    if (!fromVal) {
+      addrFb.className = 'feedback address-feedback address-error visible';
+      addrFb.textContent = 'Select a From address before sending.';
+      fromEl.classList.add('error');
+      return;
+    }
+
+    if (fromVal === wrongRouting) {
+      const msg = n === 1
+        ? 'Incorrect. do-not-reply@ is for final decisions only — replies route to Service, not back to you. Use trustandsafetyteam@ for information requests.'
+        : 'Incorrect. trustandsafetyteam@ is for information requests — replies route back to the queue. Use do-not-reply@ for final decisions.';
+      addrFb.className = 'feedback address-feedback address-error visible';
+      addrFb.textContent = msg;
+      fromEl.classList.add('error');
+      return;
+    }
+
+    if (fromVal !== correctFrom) {
+      const msg = n === 1 ? 'Incorrect address. Use trustandsafetyteam@ for information requests.' : 'Incorrect address. Use do-not-reply@ for final decisions.';
+      addrFb.className = 'feedback address-feedback address-error visible';
+      addrFb.textContent = msg;
+      fromEl.classList.add('error');
+      return;
+    }
+
+    fromEl.classList.add('success');
+
+    if (phVal.length === 0) {
+      fb.className = 'feedback empty';
+      fb.textContent = 'This placeholder must be filled before sending.';
+      field.classList.add('flagged');
+      return;
+    }
+
+    const thinPhrases = ['please send documentation', 'send documentation', 'see notes', 'documentation needed', 'review does not violate', 'does not violate policy', 'not a violation', 'as discussed', 'per notes'];
+    const isThin = phVal.length < 40 || thinPhrases.some(p => phVal.toLowerCase().includes(p));
+
+    if (isThin) {
+      fb.className = 'feedback flag';
+      fb.textContent = n === 1
+        ? 'Be specific. Name the documents you need and explain what they should show.'
+        : 'Expand this. State what was reviewed and why the violation threshold wasn\'t met.';
+      field.classList.add('flagged');
+      model.classList.add('visible');
+      return;
+    }
+
+    fb.className = 'feedback good';
+    fb.textContent = n === 1
+      ? 'Sent. You named the specific documents and explained what they need to show.'
+      : 'Sent. You described what was reviewed and why it doesn\'t meet the removal threshold. Case closed.';
+    field.classList.add('success');
+    field.disabled = true;
+    fromEl.disabled = true;
+    model.classList.add('visible');
+
+    if (n === 1) {
+      document.getElementById('dot1').classList.replace('active', 'complete');
+      document.getElementById('dot2').classList.add('active');
+      document.getElementById('progress-label').textContent = 'Email 2 of 2';
+      document.getElementById('email2').style.display = 'block';
+      showBanner('good', 'Email 1 sent correctly. ↓ Scroll down to complete Email 2.');    } else {
+      document.getElementById('dot2').classList.replace('active', 'complete');
+      document.getElementById('progress-label').textContent = 'Complete';
+      document.getElementById('completion').classList.add('visible');
+      showBanner('good', 'Both emails sent correctly. ↓ Scroll down to see your summary.');
+    }
+  }
+
+  function resetEmail(n) {
+    ['ph','from'].forEach(id => {
+      const el = document.getElementById(id + n);
+      el.value = '';
+      el.disabled = false;
+      el.className = id === 'ph' ? 'placeholder-field' : 'sf-select';
+    });
+    ['feedback','addr-feedback'].forEach(id => {
+      const el = document.getElementById(id + n);
+      el.className = id === 'feedback' ? 'feedback' : 'feedback address-feedback';
+      el.textContent = '';
+    });
+    document.getElementById('model' + n).classList.remove('visible');
+    document.getElementById('char' + n).textContent = '0 characters';
+    dismissBanner();
+  }
+
+  function goBack() {
+    document.getElementById('email2').style.display = 'none';
+    document.getElementById('dot2').className = 'progress-dot';
+    document.getElementById('dot1').className = 'progress-dot active';
+    document.getElementById('progress-label').textContent = 'Email 1 of 2';
+    resetEmail(1);
+    document.getElementById('email1').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function resetAll() {
+    resetEmail(1); resetEmail(2);
+    document.getElementById('completion').classList.remove('visible');
+    document.getElementById('email2').style.display = 'none';
+    document.getElementById('dot1').className = 'progress-dot active';
+    document.getElementById('dot2').className = 'progress-dot';
+    document.getElementById('progress-label').textContent = 'Email 1 of 2';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+
+</body>
+</html>
