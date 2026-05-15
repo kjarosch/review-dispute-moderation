@@ -446,7 +446,7 @@
   <div id="email1">
     <div class="scenario-bar">
       <strong>Scenario — Email 1 of 2</strong>
-      A pro disputes a review, claiming it was intended for a different pro with a similar name. You need proof of work and proof of outreach to multiple pros from the customer before you can decide.
+      A pro disputes a review and claims the customer sent harassing messages after the job ended. You need screenshots and communication records from the pro before you can decide.
     </div>
 
     <div class="sf-shell">
@@ -488,8 +488,8 @@
           <span class="sf-field-label">To</span>
           <div class="sf-field-value">
             <span class="to-pill">
-              <span class="to-pill-icon">C</span>
-              Customer <span style="color:#888;font-size:11px;margin-left:4px;">Auto-populated by Salesforce</span>
+              <span class="to-pill-icon">P</span>
+              Pro <span style="color:#888;font-size:11px;margin-left:4px;">Auto-populated by Salesforce</span>
             </span>
           </div>
         </div>
@@ -520,7 +520,7 @@
             <div class="feedback" id="feedback1"></div>
             <div class="model-answer" id="model1">
               <span class="model-answer-label">✓ Strong placeholder example</span>
-              <p>"Please provide proof that you hired or attempted to hire [Pro Name], such as a contract, invoice, or confirmation of direct communication. Please also provide any evidence that you reached out to multiple professionals with a similar name during this period."</p>
+              <p>"Please provide screenshots of the messages you received from the customer after the job concluded, including the dates and times when they occurred, and any related communication records — such as text messages, in-app messages, or emails — that document the harassment."</p>
             </div>
           </div>
           <p>This review dispute will remain under review, and the decision will be pending until this information is received. Please submit the required information at your earliest convenience.</p>
@@ -645,7 +645,7 @@
       </div>
       <div class="completion-rule">
         <span class="rule-icon">📩</span>
-        <span><strong>Review Not Removed</strong> → do-not-reply@. No status change. Placeholder states what was reviewed and why it didn't meet the removal threshold.</span>
+        <span><strong>Review Not Removed</strong> → do-not-reply@. Close the case after sending. Placeholder states what was reviewed and why it didn't meet the removal threshold.</span>
       </div>
       <div class="completion-rule">
         <span class="rule-icon">🚫</span>
@@ -747,13 +747,13 @@
       return;
     }
 
-    const thinPhrases = ['please send documentation', 'send documentation', 'see notes', 'documentation needed', 'review does not violate', 'does not violate policy', 'not a violation', 'as discussed', 'per notes'];
+    const thinPhrases = ['please send documentation', 'send documentation', 'see notes', 'documentation needed', 'send screenshots', 'please send screenshots', 'review does not violate', 'does not violate policy', 'not a violation', 'as discussed', 'per notes'];
     const isThin = phVal.length < 40 || thinPhrases.some(p => phVal.toLowerCase().includes(p));
 
     if (isThin) {
       fb.className = 'feedback flag';
       fb.textContent = n === 1
-        ? 'Be specific. Name the documents you need and explain what they should show.'
+        ? 'Be specific. Name the documents you need, the timeframe, and what they should show.'
         : 'Expand this. State what was reviewed and why the violation threshold wasn\'t met.';
       field.classList.add('flagged');
       model.classList.add('visible');
