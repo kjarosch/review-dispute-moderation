@@ -318,6 +318,32 @@
 
   .model-answer p { font-size: 14px; color: #1A4A35; line-height: 1.8; font-style: italic; }
 
+  /* CASE ACTION FIELD — distinct visual block to signal it's a separate decision */
+  .case-action-block {
+    margin: 16px 20px 0;
+    padding: 14px 16px;
+    background: #F8FBFF;
+    border: 1px solid #C5DFF8;
+    border-radius: 6px;
+  }
+
+  .case-action-label {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #005FB2;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .case-action-sub {
+    font-size: 12.5px;
+    color: #555;
+    margin-bottom: 10px;
+    line-height: 1.6;
+  }
+
   /* STICKY FEEDBACK BANNER */
   .sticky-banner {
     display: none;
@@ -354,6 +380,9 @@
 
   .address-feedback { display: none; margin: 4px 20px 0; }
   .address-feedback.visible { display: block; }
+
+  .action-feedback { display: none; margin: 8px 0 0; }
+  .action-feedback.visible { display: block; }
 
   .sf-send-bar {
     display: flex;
@@ -429,7 +458,7 @@
   <div class="activity-header">
     <span class="activity-label">Activity 3</span>
     <h1>Fill the Template</h1>
-    <p>Two emails to send. Select the correct From address, and fill in the placeholder correctly before sending. Thin or empty placeholders will be flagged.</p>
+    <p>Two emails to send. For each one: select the correct From address, fill in the placeholder, and pick the right next step for the case. Thin or empty placeholders will be flagged.</p>
   </div>
 
   <div class="template-reminder">
@@ -526,6 +555,26 @@
           <p>This review dispute will remain under review, and the decision will be pending until this information is received. Please submit the required information at your earliest convenience.</p>
           <p>If you have questions, you can reply to this email.</p>
           <p>Thank you,<br>Trust &amp; Safety</p>
+        </div>
+      </div>
+
+      <div class="case-action-block">
+        <span class="case-action-label">After sending — case action</span>
+        <div class="case-action-sub">What's the next step on this case once the email goes out?</div>
+        <div class="sf-select-wrapper">
+          <select class="sf-select" id="action1" onchange="clearActionFeedback(1)">
+            <option value="">-- Select case action --</option>
+            <option value="pending">Set status to Pending Customer</option>
+            <option value="close">Close the case</option>
+            <option value="none">No status change</option>
+          </select>
+          <span class="sf-select-arrow">▾</span>
+        </div>
+        <div class="feedback action-feedback" id="action-feedback1"></div>
+      </div>
+
+      <div class="sf-send-bar">
+        <div class="sf-send-left"></div>
         <div class="sf-send-right">
           <button class="sf-btn sf-btn-ghost" onclick="resetEmail(1)">Reset</button>
           <button class="sf-btn sf-btn-primary" onclick="checkEmail(1)">Send Email</button>
@@ -621,6 +670,21 @@
         </div>
       </div>
 
+      <div class="case-action-block">
+        <span class="case-action-label">After sending — case action</span>
+        <div class="case-action-sub">What's the next step on this case once the email goes out?</div>
+        <div class="sf-select-wrapper">
+          <select class="sf-select" id="action2" onchange="clearActionFeedback(2)">
+            <option value="">-- Select case action --</option>
+            <option value="pending">Set status to Pending Customer</option>
+            <option value="close">Close the case</option>
+            <option value="none">No status change</option>
+          </select>
+          <span class="sf-select-arrow">▾</span>
+        </div>
+        <div class="feedback action-feedback" id="action-feedback2"></div>
+      </div>
+
       <div class="sf-send-bar">
         <div class="sf-send-left">
           <button class="sf-btn sf-btn-ghost" onclick="goBack()">← Back</button>
@@ -637,11 +701,11 @@
   <div class="completion" id="completion">
     <div class="completion-icon">✅</div>
     <h2>Both emails sent correctly.</h2>
-    <p>You selected the right address, used the right template, and filled every placeholder with something specific and defensible. That's what closes a case cleanly.</p>
+    <p>You selected the right address, used the right template, filled every placeholder with something specific and defensible, and made the right call on the case. That's what closes a case cleanly.</p>
     <div class="completion-rules">
       <div class="completion-rule">
         <span class="rule-icon">📋</span>
-        <span><strong>Need More Information</strong> → trustandsafetyteam@. Placeholder names the exact documents needed.</span>
+        <span><strong>Need More Information/Documentation</strong> → trustandsafetyteam@. Set status to Pending Customer after sending. Placeholder names the exact documents needed.</span>
       </div>
       <div class="completion-rule">
         <span class="rule-icon">📩</span>
@@ -700,19 +764,31 @@
     document.getElementById('from' + n).classList.remove('error', 'success');
   }
 
+  function clearActionFeedback(n) {
+    const fb = document.getElementById('action-feedback' + n);
+    fb.className = 'feedback action-feedback';
+    fb.textContent = '';
+    document.getElementById('action' + n).classList.remove('error', 'success');
+  }
+
   function checkEmail(n) {
     const fromVal = document.getElementById('from' + n).value;
     const phVal = document.getElementById('ph' + n).value.trim();
+    const actionVal = document.getElementById('action' + n).value;
     const fromEl = document.getElementById('from' + n);
+    const actionEl = document.getElementById('action' + n);
     const addrFb = document.getElementById('addr-feedback' + n);
+    const actionFb = document.getElementById('action-feedback' + n);
     const fb = document.getElementById('feedback' + n);
     const field = document.getElementById('ph' + n);
     const model = document.getElementById('model' + n);
     const correctFrom = n === 1 ? 'ts' : 'dnr';
     const wrongRouting = n === 1 ? 'dnr' : 'ts';
+    const correctAction = n === 1 ? 'pending' : 'close';
 
     dismissBanner();
 
+    // Address checks
     if (!fromVal) {
       addrFb.className = 'feedback address-feedback address-error visible';
       addrFb.textContent = 'Select a From address before sending.';
@@ -740,6 +816,7 @@
 
     fromEl.classList.add('success');
 
+    // Placeholder: empty check
     if (phVal.length === 0) {
       fb.className = 'feedback empty';
       fb.textContent = 'This placeholder must be filled before sending.';
@@ -747,8 +824,26 @@
       return;
     }
 
+    // Placeholder: wrong-scenario check — catches content meant for the other email
+    const lowerPh = phVal.toLowerCase();
+    const wrongScenarioPhrases = n === 1
+      ? ['does not violate', 'doesn\'t violate', 'doesn\'t meet the threshold', 'does not meet the threshold', 'doesn\'t meet the removal', 'does not meet the removal', 'leave the review', 'review will remain', 'remain on your profile', 'decision is final', 'service experience between', 'content and review policy']
+      : ['please provide', 'please send', 'please reply', 'please submit', 'we need additional', 'we need documents', 'dates and times when', 'after the job concluded', 'after the job ended', 'messages you received', 'communication records', 'proof of work', 'proof of outreach', 'screenshots of the messages', 'screenshots of harass'];
+    const isWrongScenario = wrongScenarioPhrases.some(p => lowerPh.includes(p));
+
+    if (isWrongScenario) {
+      fb.className = 'feedback flag';
+      fb.textContent = n === 1
+        ? 'This reads like a final-decision explanation, not a request for documentation. The pro hasn\'t gotten a verdict yet — you\'re asking them to send evidence so you can decide. State the documents you need and what they should show.'
+        : 'This reads like a documentation request, not a reason for the decision. The pro already provided what they had — now you\'re explaining why the review stays. State what was reviewed and why it didn\'t meet the removal threshold.';
+      field.classList.add('flagged');
+      model.classList.add('visible');
+      return;
+    }
+
+    // Placeholder: thin check
     const thinPhrases = ['please send documentation', 'send documentation', 'see notes', 'documentation needed', 'send screenshots', 'please send screenshots', 'review does not violate', 'does not violate policy', 'not a violation', 'as discussed', 'per notes'];
-    const isThin = phVal.length < 40 || thinPhrases.some(p => phVal.toLowerCase().includes(p));
+    const isThin = phVal.length < 40 || thinPhrases.some(p => lowerPh.includes(p));
 
     if (isThin) {
       fb.className = 'feedback flag';
@@ -760,13 +855,49 @@
       return;
     }
 
+    field.classList.add('success');
+    fb.className = 'feedback';
+    fb.textContent = '';
+
+    // Case action check
+    if (!actionVal) {
+      actionFb.className = 'feedback action-feedback address-error visible';
+      actionFb.textContent = 'Pick a case action before sending.';
+      actionEl.classList.add('error');
+      return;
+    }
+
+    if (actionVal !== correctAction) {
+      let msg = '';
+      if (n === 1) {
+        if (actionVal === 'close') {
+          msg = 'Incorrect. You haven\'t made a final decision yet — you\'re waiting on documentation from the pro. Closing the case would shut it before the response comes back. Set status to Pending Customer instead.';
+        } else if (actionVal === 'none') {
+          msg = 'Incorrect. The case is waiting on a response from the pro. Without Pending Customer, the case looks idle in SLA reporting. Set status to Pending Customer to flag that you\'re waiting on an external response.';
+        }
+      } else {
+        if (actionVal === 'pending') {
+          msg = 'Incorrect. Pending Customer is for cases waiting on a response. This is a final decision — the review stays. Close the case after sending.';
+        } else if (actionVal === 'none') {
+          msg = 'Incorrect. The decision is final. Leaving the case open clutters your queue with closed work. Close the case after sending.';
+        }
+      }
+      actionFb.className = 'feedback action-feedback address-error visible';
+      actionFb.textContent = msg;
+      actionEl.classList.add('error');
+      return;
+    }
+
+    actionEl.classList.add('success');
+
+    // Everything correct
     fb.className = 'feedback good';
     fb.textContent = n === 1
-      ? 'Sent. You named the specific documents and explained what they need to show.'
-      : 'Sent. You described what was reviewed and why it doesn\'t meet the removal threshold. Case closed.';
-    field.classList.add('success');
+      ? 'Sent. You named the specific documents, used the right address, and set the case to Pending Customer while you wait.'
+      : 'Sent. You explained why the review didn\'t meet the removal threshold, used the right address, and closed the case.';
     field.disabled = true;
     fromEl.disabled = true;
+    actionEl.disabled = true;
     model.classList.add('visible');
 
     if (n === 1) {
@@ -774,7 +905,8 @@
       document.getElementById('dot2').classList.add('active');
       document.getElementById('progress-label').textContent = 'Email 2 of 2';
       document.getElementById('email2').style.display = 'block';
-      showBanner('good', 'Email 1 sent correctly. ↓ Scroll down to complete Email 2.');    } else {
+      showBanner('good', 'Email 1 sent correctly. ↓ Scroll down to complete Email 2.');
+    } else {
       document.getElementById('dot2').classList.replace('active', 'complete');
       document.getElementById('progress-label').textContent = 'Complete';
       document.getElementById('completion').classList.add('visible');
@@ -783,15 +915,18 @@
   }
 
   function resetEmail(n) {
-    ['ph','from'].forEach(id => {
+    ['ph','from','action'].forEach(id => {
       const el = document.getElementById(id + n);
       el.value = '';
       el.disabled = false;
-      el.className = id === 'ph' ? 'placeholder-field' : 'sf-select';
+      if (id === 'ph') el.className = 'placeholder-field';
+      else el.className = 'sf-select';
     });
-    ['feedback','addr-feedback'].forEach(id => {
+    ['feedback','addr-feedback','action-feedback'].forEach(id => {
       const el = document.getElementById(id + n);
-      el.className = id === 'feedback' ? 'feedback' : 'feedback address-feedback';
+      if (id === 'feedback') el.className = 'feedback';
+      else if (id === 'addr-feedback') el.className = 'feedback address-feedback';
+      else el.className = 'feedback action-feedback';
       el.textContent = '';
     });
     document.getElementById('model' + n).classList.remove('visible');
